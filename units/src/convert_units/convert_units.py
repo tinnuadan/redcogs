@@ -120,9 +120,3 @@ def findConversion(unit: str):
       break
   return result
 
-
-
-conv = findConversion("F")
-res = conv.convert(32)
-print(res)
-print(res.toBest(conv.cto()))
