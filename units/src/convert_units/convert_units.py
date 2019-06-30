@@ -75,8 +75,10 @@ class Conversion:
     return ConversionResult(result, result_measure)
 
 
+conversionsData: List = []
 
 def loadConversionsData():
+  global conversionsData
   result: List = []
   available: List = ["area", "length", "mass", "speed", "temperature", "volume"]
   for v in available:
@@ -88,10 +90,8 @@ def loadConversionsData():
       c.metric = loadMeasurement(measure["metric"], True)
       c.imperial = loadMeasurement(measure["imperial"], False)
       result.append(c)
-  return result
+  conversionsData = result
 
-
-conversionsData = loadConversionsData()
 
 
 def findMeasureForUnit(unit: str, measurement: Measurement):
