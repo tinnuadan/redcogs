@@ -1,7 +1,8 @@
 
 import json
+import os
 from typing import Dict, List
-from measurements import loadMeasurement, Measurement, Measure
+from .measurements import loadMeasurement, Measurement, Measure
 
 
 class ConversionData:
@@ -81,9 +82,10 @@ def loadConversionsData():
   global conversionsData
   result: List = []
   available: List = ["area", "length", "mass", "speed", "temperature", "volume"]
+  base_path = os.path.split(os.path.realpath(__file__))
   for v in available:
     c = ConversionData()
-    with open("definitions/%s.json" % (v), "r") as f:
+    with open("%s/definitions/%s.json" % (base_path, v), "r") as f:
       print("Loading %s" % v)
       data = f.read()
       measure: dict = json.loads(data)
