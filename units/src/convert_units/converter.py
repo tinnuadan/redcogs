@@ -11,17 +11,19 @@ class ConversionData:
     self.imperial: Measurement = None
 
 class ConversionResult:
-  def __init__(self, value, measure):
+  def __init__(self, value, measure, data):
     self.value: float = value
     self.measure: Measure = measure
+    self.data: Measurement = data
 
   def __str__(self):
     return "%.2f %s" % (self.value, self.measure.unit)
 
-  def toBest(self, measurement: Measurement):
+  def toBest(self):
     """  Looks through every possibility for the 'best' available unit.
     i.e. Where the value has the fewest numbers before the decimal point,
     but is still higher than 1."""
+    measurement: Measurement = self.data
     if not measurement.hasUnit(self.measure.unit):
       raise Exception("Measurement does not include unit %s" % self.measure.unit)
     
@@ -39,7 +41,7 @@ class ConversionResult:
           result['nbd'] = len(tmp[0])
           result['measurement'] = m
     
-    return ConversionResult( value / result['measurement'].to_anchor, result['measurement'])
+    return ConversionResult( value / result['measurement'].to_anchor, result['measurement'], self.data)
 
 
 class Conversion:
@@ -73,7 +75,7 @@ class Conversion:
       result = result * fr.anchor.ratio
 
     result_measure: Measure = to.anchor.measure
-    return ConversionResult(result, result_measure)
+    return ConversionResult(result, result_measure, to)
 
 
 conversionsData: List = []
