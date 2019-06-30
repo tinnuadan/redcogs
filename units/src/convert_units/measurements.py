@@ -36,6 +36,12 @@ class Measurement():
         return True
     return False
 
+def autoConvertFraction(frac: any):
+  if isinstance(frac, str):
+    tmp = frac.split("/") #ratio
+    return float(tmp[0]) / float(tmp[1])
+  else:
+    return frac
 
 def loadMeasurement(definition: Dict, is_metric: bool):
   result: Measurement = Measurement()
@@ -50,7 +56,7 @@ def loadMeasurement(definition: Dict, is_metric: bool):
       if "transform" in v.keys():
         anchor.transform = eval("lambda x: %s" % v["transform"])
       else:
-        anchor.ratio = v["ratio"]
+        anchor.ratio = autoConvertFraction(v["ratio"])
     elif k[0] != "_":
       m: Measure = Measure()
       m.unit = k
@@ -59,11 +65,7 @@ def loadMeasurement(definition: Dict, is_metric: bool):
       m.aliases.append(v["name"]["singular"])
       m.aliases.append(v["name"]["plural"])
       m.name = v["name"]["singular"]
-      if isinstance(v["to_anchor"], str):
-        tmp = v["to_anchor"].split("/") #ratio
-        m.to_anchor = float(tmp[0]) / float(tmp[1])
-      else:
-        m.to_anchor = v["to_anchor"]
+      m.to_anchor = autoConvertFraction(v["to_anchor"])
       result.measures.append(m)
   for m in result.measures:
     if m.unit == anchor_unit:
