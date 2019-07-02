@@ -11,10 +11,9 @@ class ConversionData:
     self.imperial: Measurement = None
 
 class ConversionResult:
-  def __init__(self, value, measure, data):
+  def __init__(self, value, measure):
     self.value: float = value
     self.measure: Measure = measure
-    self.data: Measurement = data
 
   def __str__(self):
     return "%.2f %s" % (self.value, self.measure.unit)
@@ -23,7 +22,7 @@ class ConversionResult:
     """  Looks through every possibility for the 'best' available unit.
     i.e. Where the value has the fewest numbers before the decimal point,
     but is still higher than 1."""
-    measurement: Measurement = self.data
+    measurement: Measurement = self.measure.parent
     if not measurement.hasUnit(self.measure.unit):
       raise Exception("Measurement does not include unit %s" % self.measure.unit)
     
@@ -41,7 +40,7 @@ class ConversionResult:
           result['nbd'] = len(tmp[0])
           result['measurement'] = m
     
-    return ConversionResult( value / result['measurement'].to_anchor, result['measurement'], self.data)
+    return ConversionResult( value / result['measurement'].to_anchor, result['measurement'])
 
 
 class Conversion:
@@ -60,7 +59,7 @@ class Conversion:
       raise Exception("No conversion set")
     return self.conversion.metric if not self.is_base_metric else self.conversion.imperial
   
-  def convert(self, value):
+  def convert(self, value: float):
     print("Converting %s to %s" % (self.base_measure.unit, self.cto().anchor.measure.unit))
     result: float = 0
 
@@ -75,7 +74,24 @@ class Conversion:
       result = result * fr.anchor.ratio
 
     result_measure: Measure = to.anchor.measure
-    return ConversionResult(result, result_measure, to)
+    return ConversionResult(result, result_measure)
+
+  def convertTo(self, value: float, to: Measure):
+    print("Converting %s to %s" % (self.base_measure.unit, to.unit))
+    result: float = 0
+
+    #parents must be the same
+    if self.base_measure.parent != to.parent:
+      raise Exception("Parents must be the same")
+
+  
+    # to anchor
+    result = value * self.base_measure.to_anchor - self.base_measure.anchor_shift
+    # to the new value
+    result = (result + to.anchor_shift) / to.to_anchor
+
+    return ConversionResult(result, to)
+
 
 
 conversionsData: List = []

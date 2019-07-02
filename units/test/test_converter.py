@@ -45,6 +45,17 @@ def test_findConversion():
   assert converter.findConversion("knot").base_measure.unit == "kn"
   assert converter.findConversion("knots").base_measure.unit == "kn"
 
+def test_convertTo():
+  load_helper()
+  
+  c = converter.findConversion("m/s")
+  to = converter.findConversion("km/h")
+  assert c != None
+  assert to != None
+  conv = c.convertTo(1, to.base_measure)
+  assert conv.value == 3.6
+
+
 def test_conversion_ratio():
   load_helper()
 
