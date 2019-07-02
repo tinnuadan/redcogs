@@ -22,7 +22,7 @@ class UnitCog(commands.Cog):
       tmp = []
       for t in result:
         cr: ConversionResult = t
-        tmp = "%s = %s" % (cr.orig, cr.conv)
+        tmp.append("%s = %s" % (cr.orig, cr.conv))
       answer = "Fyi: %s" % ", ".join(tmp)
       await ctx.send(answer)
     else:

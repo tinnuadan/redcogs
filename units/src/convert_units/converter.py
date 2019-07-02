@@ -100,14 +100,14 @@ def loadConversionsData():
   global conversionsData
   result: List = []
   available: List = ["area", "length", "mass", "speed", "temperature", "volume"]
-  base_path = os.path.split(os.path.realpath(__file__))
+  base_path = os.path.split(os.path.realpath(__file__))[0]
   for v in available:
     c = ConversionData()
     with open("%s/definitions/%s.json" % (base_path, v), "r") as f:
       print("Loading %s" % v)
       data = f.read()
       measure: dict = json.loads(data)
-      c.convertToBest = data["convert_to_best"]
+      c.convertToBest = measure["convert_to_best"]
       c.metric = loadMeasurement(v, measure["metric"], True)
       c.imperial = loadMeasurement(v, measure["imperial"], False)
       result.append(c)
