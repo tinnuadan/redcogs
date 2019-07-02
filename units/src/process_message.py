@@ -103,6 +103,9 @@ class MessageProcessor:
       result: converter.ConversionResult = toConv.matchToProcess.conversion.convert(val)
       orig: str = str( converter.ConversionResult(val, toConv.matchToProcess.conversion.base_measure) )
 
+      if toConv.matchToProcess.conversion.conversion.convertToBest:
+        result = result.toBest()
+
       conv: str = str(result)
       toReplace.append(_ConversionResult(orig, conv))
     return toReplace

@@ -1,4 +1,5 @@
 {
+  "convert_to_best" : false,
 "metric": {
   "_anchor": {
     "unit": "km/h"

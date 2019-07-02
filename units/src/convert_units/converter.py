@@ -7,6 +7,7 @@ from .measurements import loadMeasurement, Measurement, Measure
 
 class ConversionData:
   def __init__(self):
+    self.convertToBest: bool = False
     self.metric: Measurement = None
     self.imperial: Measurement = None
 
@@ -106,6 +107,7 @@ def loadConversionsData():
       print("Loading %s" % v)
       data = f.read()
       measure: dict = json.loads(data)
+      c.convertToBest = data["convert_to_best"]
       c.metric = loadMeasurement(v, measure["metric"], True)
       c.imperial = loadMeasurement(v, measure["imperial"], False)
       result.append(c)

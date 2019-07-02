@@ -1,4 +1,5 @@
 {
+  "convert_to_best" : true,
   "metric": {
   "_anchor": {
     "unit": "g"
