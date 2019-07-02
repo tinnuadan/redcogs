@@ -1,5 +1,5 @@
 from redbot.core import commands
-from process_message import MessageProcessor, ConversionResult
+from .process_message import MessageProcessor, ConversionResult
 from .convert_units.converter import loadConversionsData
 
 class UnitCog(commands.Cog):
