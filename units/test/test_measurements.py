@@ -10,7 +10,7 @@ def test_loading():
   with open("testdata_ratio.json", "r") as f:
     data = f.read()
     measure: dict = json.loads(data)
-    m = measurements.loadMeasurement(measure["metric"], True)
+    m = measurements.loadMeasurement("ratio", measure["metric"], True)
     
   assert m != None
   assert len(m.measures) == 2

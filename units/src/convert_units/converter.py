@@ -91,8 +91,8 @@ def loadConversionsData():
       print("Loading %s" % v)
       data = f.read()
       measure: dict = json.loads(data)
-      c.metric = loadMeasurement(measure["metric"], True)
-      c.imperial = loadMeasurement(measure["imperial"], False)
+      c.metric = loadMeasurement(v, measure["metric"], True)
+      c.imperial = loadMeasurement(v, measure["imperial"], False)
       result.append(c)
   conversionsData = result
 

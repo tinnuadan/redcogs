@@ -25,7 +25,8 @@ class Anchor():
 
 
 class Measurement():
-  def __init__(self):
+  def __init__(self, name: str):
+    self.name: str = name
     self.anchor: Anchor = Anchor()
     self.measures: List = []
     self.is_metric: bool = False
@@ -43,8 +44,8 @@ def autoConvertFraction(frac: any):
   else:
     return frac
 
-def loadMeasurement(definition: Dict, is_metric: bool):
-  result: Measurement = Measurement()
+def loadMeasurement(name: str, definition: Dict, is_metric: bool):
+  result: Measurement = Measurement(name)
   result.is_metric = is_metric
   anchor: Anchor = result.anchor
   anchor_unit: str = None

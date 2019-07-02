@@ -9,16 +9,16 @@ def load_helper():
   with open("testdata_ratio.json", "r") as f:
     data = f.read()
     measure: dict = json.loads(data)
-    c.metric = measurements.loadMeasurement(measure["metric"], True)
-    c.imperial = measurements.loadMeasurement(measure["imperial"], False)
+    c.metric = measurements.loadMeasurement("ratio", measure["metric"], True)
+    c.imperial = measurements.loadMeasurement("ratio", measure["imperial"], False)
     result.append(c)
   
   c = converter.ConversionData()
   with open("testdata_transform.json", "r") as f:
     data = f.read()
     measure: dict = json.loads(data)
-    c.metric = measurements.loadMeasurement(measure["metric"], True)
-    c.imperial = measurements.loadMeasurement(measure["imperial"], False)
+    c.metric = measurements.loadMeasurement("transform", measure["metric"], True)
+    c.imperial = measurements.loadMeasurement("transform", measure["imperial"], False)
     result.append(c)
   
   converter.conversionsData = result
@@ -29,7 +29,7 @@ def test_findMeasure():
   with open("testdata_ratio.json", "r") as f:
     data = f.read()
     measure: dict = json.loads(data)
-    m = measurements.loadMeasurement(measure["imperial"], False)
+    m = measurements.loadMeasurement("ratio", measure["imperial"], False)
   
   measure = converter.findMeasureForUnit("m/h", m)
 
