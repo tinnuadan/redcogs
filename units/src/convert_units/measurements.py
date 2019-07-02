@@ -3,12 +3,13 @@ from typing import Dict, List
 
 
 class Measure():  
-  def __init__(self):
+  def __init__(self, parent):
     self.unit: str = ""
     self.aliases: List = []
     self.name: str = ""
     self.to_anchor: float = 1
     self.anchor_shift: float = 0
+    self.parent: Measurement = parent
 
   def __str__(self):
     aliases = self.aliases
@@ -59,7 +60,7 @@ def loadMeasurement(name: str, definition: Dict, is_metric: bool):
       else:
         anchor.ratio = autoConvertFraction(v["ratio"])
     elif k[0] != "_":
-      m: Measure = Measure()
+      m: Measure = Measure(result)
       m.unit = k
       if "aliases" in v.keys():
         m.aliases = v["aliases"]
