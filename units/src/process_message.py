@@ -43,6 +43,7 @@ class MessageProcessor:
     matches = self._findMatches(msg)
     composed = self._findComposed(matches, msg)
     converted = self._processToConvert(composed)
+    return converted
 
 
   def _findMatches(self, msg: str):
