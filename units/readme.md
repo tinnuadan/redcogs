@@ -1,0 +1,24 @@
+# Unit conversion
+Just write `!convert your normal message including values with units`
+The bot will try to find values and units in your message and convert them from metric to imperial and vice versa.
+
+## Available units
+### Area
+* mm2, cm2, m2, ha, km2
+* in2, yd2, ft2, ac, mi2
+
+## Length
+* mm, cm, m, km
+* in, ft, yd, fathom, mi, NM (nautical mile)
+
+## Mass
+* mg, g, kg
+* oz, lb
+
+## Temperature
+* C, K
+* F, R
+
+## Volume
+* mm3, cm3, m3, km3, ml, cl, dl, l
+* tsp, Tbs, in3, fl-oz, cup, pint, qt, gal, ft3, yd3
