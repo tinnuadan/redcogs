@@ -83,7 +83,6 @@ class Conversion:
     #parents must be the same
     if self.base_measure.parent != to.parent:
       raise Exception("Parents must be the same")
-
   
     # to anchor
     result = value * self.base_measure.to_anchor - self.base_measure.anchor_shift
