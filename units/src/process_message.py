@@ -29,7 +29,7 @@ class _ToConvert:
     self.separator: str = separator
     self.is_composed: bool = composedMTP != None
 
-class _ConversionResult:
+class ConversionResult:
   def __init__(self, orig, conv):
     self.orig: str = orig
     self.conv: str = conv
@@ -107,7 +107,7 @@ class MessageProcessor:
         result = result.toBest()
 
       conv: str = str(result)
-      toReplace.append(_ConversionResult(orig, conv))
+      toReplace.append(ConversionResult(orig, conv))
     return toReplace
       
       
