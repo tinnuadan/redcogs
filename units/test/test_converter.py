@@ -31,12 +31,12 @@ def test_findMeasure():
     measure: dict = json.loads(data)
     m = measurements.loadMeasurement("ratio", measure["imperial"], False)
   
-  measure = converter.findMeasureForUnit("m/h", m)
+  measure = converter.findMeasureForUnit("mph", m)
 
   assert m != None
   assert converter.findMeasureForUnit("km/h", m) == None
   assert converter.findMeasureForUnit("kn", m) != None
-  assert converter.findMeasureForUnit("mph", m) == measure
+  assert converter.findMeasureForUnit("mi/h", m) == measure
   
 def test_findConversion():
   load_helper()

@@ -72,13 +72,13 @@ def test_processToConvert():
   assert len(matches) == 6
   assert len(composed) == 5
   assert len(converted) == 5
-  assert converted[0].orig == "10.00 m/h" #ToDo: m/h or mph?
+  assert converted[0].orig == "10.00 mph"
   assert converted[0].conv == "16.09 km/h" 
   assert converted[1].orig == "1.00 m/s"
-  assert converted[1].conv == "2.24 m/h" #ToDo: m/h or mph?
+  assert converted[1].conv == "2.24 mph"
   assert converted[2].orig == "32.70 km/h"
-  assert converted[2].conv == "20.32 m/h" #ToDo: m/h or mph?
+  assert converted[2].conv == "20.32 mph"
   assert converted[3].orig == "2.16 m/s"
-  assert converted[3].conv == "4.83 m/h" #ToDo: m/h or mph?
+  assert converted[3].conv == "4.83 mph"
   assert converted[4].orig == "2.30 kn"
   assert converted[4].conv == "4.26 km/h"

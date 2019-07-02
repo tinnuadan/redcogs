@@ -23,11 +23,11 @@
 
   "imperial": {
     "_anchor": {
-      "unit": "m/h"
+      "unit": "mph"
     , "ratio": 1.609344
     },
-    "m/h": {
-      "aliases": ["mph"],
+    "mph": {
+      "aliases": ["mi/h"],
       "name": {
         "singular": "Mile per hour"
       , "plural": "Miles per hour"
