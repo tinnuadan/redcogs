@@ -15,6 +15,10 @@ The bot will try to find values and units in your message and convert them from 
 * mg, g, kg
 * oz, lb
 
+## Speed
+* m/s, km/h
+* mph (mi/h), kn, ft/s
+
 ## Temperature
 * C, K
 * F, R
