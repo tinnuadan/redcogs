@@ -9,7 +9,7 @@ The bot will try to find values and units in your message and convert them from 
 
 ## Length
 * mm, cm, m, km
-* in, ft, yd, fathom, mi, NM (nautical mile)
+* in, ft, yd, mi, NM (nautical mile)
 
 ## Mass
 * mg, g, kg
