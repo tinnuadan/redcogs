@@ -20,6 +20,14 @@ def load_helper():
     c.metric = measurements.loadMeasurement("transform", measure["metric"], True)
     c.imperial = measurements.loadMeasurement("transform", measure["imperial"], False)
     result.append(c)
+    
+  c = converter.ConversionData()
+  with open("testdata_best.json", "r") as f:
+    data = f.read()
+    measure: dict = json.loads(data)
+    c.metric = measurements.loadMeasurement("transform", measure["metric"], True)
+    c.imperial = measurements.loadMeasurement("transform", measure["imperial"], False)
+    result.append(c)
   
   converter.conversionsData = result
 
@@ -83,3 +91,22 @@ def test_conversion_transform():
   conv = c.convert(50)
   assert conv.measure.unit == "C"
   assert math.isclose(conv.value, 10, abs_tol = 0.001)
+
+def test_to_best():
+  load_helper()
+
+  c = converter.findConversion("cm")
+  assert c != None
+  conv = c.convert(181)
+  assert conv.measure.unit == "ft"
+  assert math.isclose(conv.value, 5.93832, abs_tol = 0.02)
+  conv = conv.toBest()
+  assert conv.measure.unit == "ft"
+  assert math.isclose(conv.value, 5.93832, abs_tol = 0.02)
+  
+  conv = c.convert(3048)
+  assert conv.measure.unit == "ft"
+  assert math.isclose(conv.value, 100.0, abs_tol = 0.01)
+  conv = conv.toBest()
+  assert conv.measure.unit == "yd"
+  assert math.isclose(conv.value, 33.3333, abs_tol = 0.01)

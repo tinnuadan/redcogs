@@ -1,0 +1,81 @@
+{
+  "convert_to_best" : true,
+  "metric": {
+    "_anchor": {
+      "unit": "m",
+      "ratio": 3.28084
+    },
+    "mm": {
+      "name": {
+        "singular": "Millimeter",
+        "plural": "Millimeters"
+      },
+      "to_anchor": 1e-3
+    },
+    "cm": {
+      "name": {
+        "singular": "Centimeter",
+        "plural": "Centimeters"
+      },
+      "to_anchor": 1e-2
+    },
+    "m": {
+      "name": {
+        "singular": "Meter",
+        "plural": "Meters"
+      },
+      "to_anchor": 1
+    },
+    "km": {
+      "name": {
+        "singular": "Kilometer",
+        "plural": "Kilometers"
+      },
+      "to_anchor": 1000
+    }
+  },
+
+  "imperial": {
+    "_anchor": {
+      "unit": "ft",
+      "ratio": "1/3.28084"
+    },
+    "in": {
+      "aliases": ["\""],
+      "name": {
+        "singular": "Inch",
+        "plural": "Inches"
+      },
+      "to_anchor": "1/12"
+    },
+    "yd": {
+      "name": {
+        "singular": "Yard",
+        "plural": "Yards"
+      },
+      "to_anchor": 3
+    },
+    "ft": {
+      "aliases": ["'"],
+      "name": {
+        "singular": "Foot",
+        "plural": "Feet"
+      },
+      "to_anchor": 1
+    },
+    "mi": {
+      "name": {
+        "singular": "Mile",
+        "plural": "Miles"
+      },
+      "to_anchor": 5280
+    },
+    "NM": {
+      "name": {
+        "singular": "Nautical Mile",
+        "plural": "Nautical Miles"
+      },
+      "to_anchor": 6076.12
+    }
+  }
+}

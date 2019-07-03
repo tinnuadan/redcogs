@@ -33,7 +33,8 @@ class ConversionResult:
     if self.measure != measurement.anchor.measure:
       value = value * self.measure.to_anchor
 
-    for m in measurement.measures:
+    sorted_measures = sorted(measurement.measures, key=lambda x: x.to_anchor, reverse=False)
+    for m in sorted_measures:
       v: float = abs(value / m.to_anchor)
       if v > 1:
         tmp = ("%.2f" % v).split(".")
