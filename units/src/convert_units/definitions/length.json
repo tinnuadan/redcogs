@@ -55,13 +55,6 @@
       },
       "to_anchor": 3
     },
-    "ft-us": {
-      "name": {
-        "singular": "US Survey Foot",
-        "plural": "US Survey Feet"
-      },
-      "to_anchor": 1.000002
-    },
     "ft": {
       "aliases": ["'"],
       "name": {
@@ -69,13 +62,6 @@
         "plural": "Feet"
       },
       "to_anchor": 1
-    },
-    "fathom": {
-      "name": {
-        "singular": "Fathom",
-        "plural": "Fathoms"
-      },
-      "to_anchor": 6
     },
     "mi": {
       "name": {
