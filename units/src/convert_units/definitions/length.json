@@ -41,7 +41,7 @@
       "ratio": "1/3.28084"
     },
     "in": {
-      "aliases": ["\""],
+      "aliases": ["\"", "''"],
       "name": {
         "singular": "Inch",
         "plural": "Inches"
