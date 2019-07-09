@@ -18,7 +18,9 @@ class UnitCog(commands.Cog):
       result = mp.processMessage(txt)
     except Exception as e:
       print("Exception was thrown while trying to process the message: %s" % e)
-    if len(result) > 0:
+    if isinstance(result, str):
+      await ctx.send(result)
+    elif len(result) > 0:
       tmp = []
       for t in result:
         cr: ConversionResult = t

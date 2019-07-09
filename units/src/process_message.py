@@ -1,3 +1,5 @@
+import json
+import os
 import re
 from typing import List, Dict
 from .convert_units import converter
@@ -35,16 +37,35 @@ class ConversionResult:
     self.conv: str = conv
 
 class MessageProcessor:
-  _re: re.Pattern = re.compile(r'(-?\d+(?:,|\.)?\d*)\s*?([\w\/\'"]+)')  
+  _re: re.Pattern = re.compile(r'(-?\d+(?:,|\.)?\d*)\s*?([\w\/\'"]+)')
+  _special: Dict = None
 
+  def __init__(self):
+    if MessageProcessor._special == None:
+      base_path = os.path.split(os.path.realpath(__file__))[0]
+      bollocks = os.path.join(base_path, "convert_units", "definitions", "bollocks.json")
+      with open(bollocks, "r") as f:
+        data = f.read()
+        special: dict = json.loads(data)
+        MessageProcessor._special = dict(map(lambda kv: (kv[0].lower(), kv[1]), special.items()))
+    
   
   def processMessage(self, msg: str):
     # find all matches
+    sp = self._findSpecial(msg)
+    if(sp != None):
+      return sp
     matches = self._findMatches(msg)
     composed = self._findComposed(matches, msg)
     converted = self._processToConvert(composed)
     return converted
 
+  def _findSpecial(self, msg: str):
+    special: Dict = MessageProcessor._special
+    m = msg.lower().strip()
+    if m in special.keys():
+      return special[m]
+    return None
 
   def _findMatches(self, msg: str):
     matches = []
@@ -109,11 +130,3 @@ class MessageProcessor:
       conv: str = str(result)
       toReplace.append(ConversionResult(orig, conv))
     return toReplace
-      
-      
-
-
-
-    
-
-
