@@ -74,18 +74,19 @@
   "tsp": {
     "name": {
       "singular": "Teaspoon"
-    , "plural": "Teaspoons"
+      , "plural": "Teaspoons"
     }
-  , "to_anchor": "1/6"
+    , "to_anchor": "1/6"
   }
-, "Tbs": {
+  , "Tbs": {
     "name": {
       "singular": "Tablespoon"
-    , "plural": "Tablespoons"
+      , "plural": "Tablespoons"
     }
-  , "to_anchor": "1/2"
+    , "to_anchor": "1/2"
   }
-, "in3": {
+  , "in3": {
+    "aliases": ["cbin"],
     "name": {
       "singular": "Cubic inch"
     , "plural": "Cubic inches"
@@ -128,6 +129,7 @@
   , "to_anchor": 128
   }
 , "ft3": {
+    "aliases": ["cbft"],
     "name": {
       "singular": "Cubic foot"
     , "plural": "Cubic feet"
@@ -135,6 +137,7 @@
   , "to_anchor": 957.506
   }
 , "yd3": {
+    "aliases": ["cbyd"],
     "name": {
       "singular": "Cubic yard"
     , "plural": "Cubic yards"

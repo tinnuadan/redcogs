@@ -5,11 +5,11 @@ The bot will try to find values and units in your message and convert them from 
 ## Available units
 ### Area
 * mm2, cm2, m2, ha, km2
-* in2, yd2, ft2, ac, mi2
+* in2 (sqin), yd2 (sqyd), ft2 (sqft), ac, mi2 (sqmi)
 
 ## Length
 * mm, cm, m, km
-* in, ft, yd, mi, NM (nautical mile)
+* in, ft, yd, mi, NM [nautical mile]
 
 ## Mass
 * mg, g, kg
@@ -25,4 +25,4 @@ The bot will try to find values and units in your message and convert them from 
 
 ## Volume
 * mm3, cm3, m3, km3, ml, cl, dl, l
-* tsp, Tbs, in3, fl-oz, cup, pint, qt, gal, ft3, yd3
+* tsp, Tbs, in3 (cbin), fl-oz, cup, pint, qt, gal, ft3 (cbft), yd3 (cbyd)
