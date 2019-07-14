@@ -1,16 +1,54 @@
 import csv
+from datetime import tzinfo, timedelta, datetime
 from typing import List, Dict
 import sqlite3
 import os
+import time
 
-class Timezone:
+class TzInfo(tzinfo):
+  def __init(self):
+    self.gmt_offset: int = None
+    self.has_dst: bool = False
+
+  @staticmethod
+  def Construct(utcoffset: int, has_dst: bool = False):
+    tz = TzInfo()
+    tz._gmt_offset = utcoffset
+    tz._has_dst = has_dst
+    if has_dst:
+      tz._gmt_offset -= 3600
+    return tz
+
+  def utcoffset(self, dt):
+    if self._gmt_offset == None:
+      return None
+    return timedelta(seconds=self._gmt_offset) + self.dst(dt)
+
+  def dst(self, dt):
+    if self._gmt_offset == None:
+      return None
+    return timedelta(hours = 1) if self._has_dst else timedelta(0)
+
+  def __str__(self):
+    if not self._gmt_offset:
+      return "Empty tzinfo"
+    return "%i+%ih" % (self._gmt_offset/3600, self.dst(None).seconds/3600)
+
+class Timezone(TzInfo):
   def __init__(self):
     self.id: int = 0
     self.country_code: str = None
     self.zone_name: str = None
     self.abbr: str = None
-    self.gmt_offset: int = 0
-    self.dst: bool = False
+
+  @staticmethod
+  def Construct(utcoffset: int, has_dst: bool = False):
+    tz = Timezone()
+    tz._gmt_offset = utcoffset
+    tz._has_dst = has_dst
+    if has_dst:
+      tz._gmt_offset -= 3600
+    return tz
 
 class Timezones:
   _mconn: sqlite3.Connection = None
@@ -19,10 +57,21 @@ class Timezones:
     if Timezones._mconn == None:
       self._initDB()
 
+  def getTzInfo(self, abbreviation: str):
+    cur = self._conn().cursor()
+    cur.execute("""SELECT tz.gmt_offset, tz.dst FROM `timezone` tz 
+    WHERE tz.abbreviation=? AND tz.time_start <= ? 
+    ORDER BY tz.time_start DESC LIMIT 1;""", [abbreviation, int(time.time())])
+    row = cur.fetchone()
+    if not row:
+      return None
+    return TzInfo.Construct(int(row[0]), int(row[1])==1)
+
   def getUTCOffset(self, abbreviation: str, unixtime: int):
     cur = self._conn().cursor()
-    cur.execute("SELECT tz.gmt_offset FROM `timezone` tz WHERE tz.abbreviation=? AND tz.time_start <= ? ORDER BY tz.time_start DESC LIMIT 1;", [abbreviation])
-    return int(cur.fetchone()[0])
+    cur.execute("SELECT tz.gmt_offset FROM `timezone` tz WHERE tz.abbreviation=? AND tz.time_start <= ? ORDER BY tz.time_start DESC LIMIT 1;", [abbreviation, unixtime])
+    row = cur.fetchone()
+    return int(row[0]) if row else None
 
   def getTimezone(self, name: str, unixtime: int):
     cur = self._conn().cursor()
@@ -32,13 +81,13 @@ class Timezones:
       WHERE tz.time_start <= ? AND z.zone_name=?
       ORDER BY tz.time_start DESC LIMIT 1;""", [unixtime, name])
     row = cur.fetchone()
-    tz: Timezone = Timezone()
+    if not row:
+      return None
+    tz: Timezone = Timezone.Construct(int(row[4]), int(row[5])==1)
     tz.id = int(row[0])
     tz.country_code = row[1]
     tz.zone_name = row[2]
     tz.abbr = row[3]
-    tz.gmt_offset = int(row[4])
-    tz.dst = int(row[5])==1
     return tz
 
   def _initDB(self, file: str = None):

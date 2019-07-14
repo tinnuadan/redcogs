@@ -1,6 +1,7 @@
 import json
 import sqlite3
-from ..src.timezones import Timezones, Timezone
+import datetime
+from ..src.timezones import Timezones, Timezone, TzInfo
 
 
 def test_loading():
@@ -18,6 +19,17 @@ def test_loading():
   assert tz.zone_name == "Europe/Berlin"
   assert tz.id == 135
   assert tz.abbr == "CEST"
-  assert tz.gmt_offset == +7200
-  assert tz.dst == True
+  assert tz._gmt_offset == +3600
+  assert tz._has_dst == True
+  assert tz.utcoffset(None).seconds == 7200
 
+  tz_info: TzInfo = tzs.getTzInfo("CET")
+  assert tz_info.utcoffset(datetime.datetime.now()) == datetime.timedelta(hours = 1)
+  assert tz_info.dst(datetime.datetime.now()) == datetime.timedelta(0)
+
+  tz_info = tzs.getTzInfo("CEST")
+  assert tz_info.utcoffset(datetime.datetime.now()) == datetime.timedelta(hours = 2)
+  assert tz_info.dst(datetime.datetime.now()) == datetime.timedelta(hours = 1)
+
+  assert tzs.getTimezone("Europe/bsa", 1562853025) == None
+  assert tzs.getTzInfo("GNT") == None
