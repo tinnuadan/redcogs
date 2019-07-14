@@ -21,3 +21,9 @@ def test_convert():
   res = convert.convert(convert.ConvertFrom(date, time, tzinfo), desttz)
   print(res)
   print(convert.ConvertFrom(date, time, tzinfo))
+
+  time = dthandling.TimeObj(4,0,0)
+  date = dthandling.DateObj(2019,7,14)
+  res = convert.convert(convert.ConvertFrom(None, time, tzinfo), desttz)
+  print(res)
+  print(convert.ConvertFrom(None, time, tzinfo))

@@ -28,9 +28,12 @@ class ConvertFrom(ConvertBase):
     ConvertBase.__init__(self, date, time, tzinfo)
 
   def __str__(self):
+    dateStr = ""
     date = self.date
     time = self.time
-    return "%4i-%02i-%02i %02i:%02i:%02i%s" % (date.year, date.month, date.day, time.hour, time.minute, time.second, self._utcStr())
+    if date:
+      dateStr = "%4i-%02i-%02i " % (date.year, date.month, date.day)
+    return "%s%02i:%02i:%02i%s" % (dateStr, time.hour, time.minute, time.second, self._utcStr())
 
 class ConvertTo(ConvertBase):
   def __init__(self, date: dthandling.DateObj, time: dthandling.TimeObj, tzinfo: timezones.TzInfo):
@@ -65,13 +68,14 @@ def convert(cfrom: ConvertFrom, desttz: timezones.Timezone):
 
   #otherwise, we just would like to have a possible day shift
   cfrom.date = dthandling.getToday()
+  dfrom: datetime.datetime  = cfrom.toDateTime()
   dto = dfrom.astimezone(desttz)
   res = ConvertTo.fromDatetime(dto, desttz)
   res.date = None
   #get day shift
   if dto.day != dfrom.day:
     dfromInDest = ConvertFrom(cfrom.date, cfrom.time, desttz).toDateTime() # treat the original date as it would be in the same tz as the destination
-    direction = (dto - dfromInDest).second
+    direction = (dto - dfromInDest).total_seconds()
     res.dayShift = 1 if direction > 0 else -1
   
   return res
