@@ -54,11 +54,6 @@ class ConvertTo(ConvertBase):
     else:
       return "%02i:%02i:%02i%+s %+i day" % (time.hour, time.minute, time.second, self._utcStr(), self.dayShift)
 
-
-def _toUnixTime(dt: datetime.datetime):
-  utc = timezones.TzInfo.Construct(0, False)
-  return int((dt - datetime.datetime(1970,1,1, tzinfo = utc)).total_seconds())
-
 def convert(cfrom: ConvertFrom, desttz: timezones.Timezone):
   #easy, we have time & date:
   if cfrom.canConvertToDateTime():

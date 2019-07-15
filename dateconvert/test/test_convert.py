@@ -1,29 +1,45 @@
 from ..src import dthandling
 from ..src import convert
+from ..src import utils
 from ..src.timezones import Timezones, Timezone, TzInfo
 import datetime
+from .helpers import getTimezones
 
-_tzs = Timezones()
 
-def testToUTC():
-  global _tzs
-  tzinfo = _tzs.getTzInfo("CEST")
-  dt = datetime.datetime(2019, 7, 14, 12, 0,0, 0, tzinfo)
-  assert convert._toUnixTime(dt) == 1563098400
 
 def test_convert():
-  global _tzs
+  tzs = getTimezones()
   time = dthandling.TimeObj(12,0,0)
   date = dthandling.DateObj(2019,7,14)
-  tzinfo = _tzs.getTzInfo("CEST")
-  dfrom = datetime.datetime(date.year, date.month, date.day, time.hour, time.minute, time.second, 0, tzinfo)
-  desttz = _tzs.getTimezone("America/New_York", convert._toUnixTime(dfrom))
-  res = convert.convert(convert.ConvertFrom(date, time, tzinfo), desttz)
-  print(res)
-  print(convert.ConvertFrom(date, time, tzinfo))
+
+  tzinfo = tzs.getTzInfo("CEST")
+  convert_from = convert.ConvertFrom(date, time, tzinfo)
+
+  dest_tz = tzs.getTimezone("America/New_York", utils.toUnixTime(convert_from.toDateTime()))
+
+  convert_res = convert.convert(convert_from, dest_tz)
+
+  assert convert_res.date.year == 2019
+  assert convert_res.date.month == 7
+  assert convert_res.date.day == 14
+  assert convert_res.time.hour == 6
+  assert convert_res.time.minute == 0
+  assert convert_res.time.second == 0
 
   time = dthandling.TimeObj(4,0,0)
-  date = dthandling.DateObj(2019,7,14)
-  res = convert.convert(convert.ConvertFrom(None, time, tzinfo), desttz)
-  print(res)
-  print(convert.ConvertFrom(None, time, tzinfo))
+  convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo), dest_tz)
+  assert convert_res.date == None
+  assert convert_res.time.hour == 22
+  assert convert_res.time.minute == 0
+  assert convert_res.time.second == 0
+  assert convert_res.dayShift == -1
+
+  dest_tz = tzs.getTimezone("Australia/Brisbane", utils.toUnixTime(convert_from.toDateTime()))
+
+  time = dthandling.TimeObj(18,0,0)
+  convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo), dest_tz)
+  assert convert_res.date == None
+  assert convert_res.time.hour == 2
+  assert convert_res.time.minute == 0
+  assert convert_res.time.second == 0
+  assert convert_res.dayShift == 1
