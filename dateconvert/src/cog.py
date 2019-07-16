@@ -28,7 +28,6 @@ class DateConvertCog(commands.Cog):
     elif txt == "tz":
       msg = self._avtzs()
     else:
-      print("Converting %s" % txt)
       try:
         msg = self._doConversion(txt)
       except error.TimezoneNotFoundError:
