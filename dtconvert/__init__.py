@@ -1,4 +1,4 @@
-from .src.cog import DateConvertCog
+from .src.cog import DTConvertCog
 
 def setup(bot):
-    bot.add_cog(DateConvertCog())
+    bot.add_cog(DTConvertCog())
