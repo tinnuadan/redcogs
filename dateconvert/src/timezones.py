@@ -58,6 +58,8 @@ class Timezones:
       self._initDB()
 
   def getTzInfo(self, abbreviation: str):
+    if len(abbreviation) == 5 and (abbreviation[0]=="+" or abbreviation[0]=="-"):
+      return self._getRawTzOffset(abbreviation)
     cur = self._conn().cursor()
     cur.execute("""SELECT tz.gmt_offset, tz.dst FROM `timezone` tz 
     WHERE tz.abbreviation=? AND tz.time_start <= ? 
@@ -66,6 +68,12 @@ class Timezones:
     if not row:
       return None
     return TzInfo.Construct(int(row[0]), int(row[1])==1)
+
+  def _getRawTzOffset(self, offset: str):
+    sign = int("%s1" % offset[0])
+    hours = int(offset[1:3])
+    minutes = int(offset[3:])
+    return TzInfo.Construct(sign * (hours*3600+minutes*60), False)
 
   def getUTCOffset(self, abbreviation: str, unixtime: int):
     cur = self._conn().cursor()
