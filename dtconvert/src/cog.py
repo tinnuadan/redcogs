@@ -19,7 +19,16 @@ class DTConvertCog(commands.Cog):
 
 
   @commands.command()
-  async def dtconvert(self, ctx, *, datetime):
+  async def tz(self, ctx, *, datetime):
+    msg = self._tz(ctx, datetime)
+    await ctx.send(msg)
+
+  @commands.command()
+  async def t(self, ctx, *, datetime):
+    msg = self._tz(ctx, datetime)
+    await ctx.send(msg)
+
+  def _tz(self, ctx, datetime):
     """Converts date and time to multiple timezones"""
     txt = datetime.strip()
     msg: str = None
@@ -31,22 +40,22 @@ class DTConvertCog(commands.Cog):
       try:
         msg = self._doConversion(txt)
       except error.TimezoneNotFoundError:
-        msg = "The timezone identifier was not found. Please have a look at `!dtconvert tz` for valid identifiers."
+        msg = "The timezone identifier was not found. Please have a look at `!tz tz` for valid identifiers."
       except error.ParsingError:
-        msg = "Unable to extract date and/or time. Please have a look at `!dtconvert help` for help on formatting."
+        msg = "Unable to extract date and/or time. Please have a look at `!tz help` for help on formatting."
       except error.Error:
         msg = "Uh oh, something went wrong."
 
-    await ctx.send(msg)
+    return msg
 
 
   def _help(self):
     msg = """Convert a date and time or only a time with:
-`!dtconvert <date> <time> <timezone>`.
+`!tz <date> <time> <timezone>`.
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
-`<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!dtconvert tz`.
-You can also specifiy everything according to ISO 8601, so `!dtconvert yyyy-mm-ddThh:mm:ss+hh:mm`."""
+`<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
+You can also specifiy everything according to ISO 8601, so `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg
 
   def _avtzs(self):
