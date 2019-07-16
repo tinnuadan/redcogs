@@ -80,5 +80,5 @@ You can also specifiy everything according to ISO 8601, so `!tz yyyy-mm-ddThh:mm
         line = "%s%+i day " % (line, conv.dayShift)
       line = "%s%s " % (line, conv.timezone.abbr)
       lines.append(line)
-    return "`%s`" % ("\n".join(lines))
+    return "```HTTP\n%s```" % ("\n".join(lines))
       
