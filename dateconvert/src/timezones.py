@@ -75,12 +75,6 @@ class Timezones:
     minutes = int(offset[3:])
     return TzInfo.Construct(sign * (hours*3600+minutes*60), False)
 
-  def getUTCOffset(self, abbreviation: str, unixtime: int):
-    cur = self._conn().cursor()
-    cur.execute("SELECT tz.gmt_offset FROM `timezone` tz WHERE tz.abbreviation=? AND tz.time_start <= ? ORDER BY tz.time_start DESC LIMIT 1;", [abbreviation, unixtime])
-    row = cur.fetchone()
-    return int(row[0]) if row else None
-
   def getTimezone(self, name: str, unixtime: int):
     cur = self._conn().cursor()
     cur.execute("""SELECT z.zone_id, z.country_code, z.zone_name, tz.abbreviation, tz.gmt_offset, tz.dst
