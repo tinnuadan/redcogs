@@ -22,6 +22,14 @@ def test_loading():
   assert tz._gmt_offset == +3600
   assert tz._has_dst == True
   assert tz.utcoffset(None).seconds == 7200
+  
+  tz: Timezone = tzs.getTimezone("UTC", 1562853025)
+  assert tz.zone_name == "UTC"
+  assert tz.id == -1
+  assert tz.abbr == "UTC"
+  assert tz._gmt_offset == 0
+  assert tz._has_dst == False
+  assert tz.utcoffset(None).seconds == 0
 
   tz_info: TzInfo = tzs.getTzInfo("CET")
   assert tz_info.utcoffset(datetime.datetime.now()) == datetime.timedelta(hours = 1)
@@ -39,3 +47,6 @@ def test_loading():
   assert tzs._getRawTzOffset("-1000").utcoffset(None).total_seconds() == -10*3600
   assert tzs._getRawTzOffset("+0145").utcoffset(None).total_seconds() == 3600+45*60
   assert tzs._getRawTzOffset("-0145").utcoffset(None).total_seconds() == -3600-45*60
+
+  zones = tzs.getAvailableAbbreviations()
+  assert len(zones) == 119

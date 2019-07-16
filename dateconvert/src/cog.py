@@ -1,12 +1,75 @@
 from redbot.core import commands
 import discord
 import typing
+from .process_message import MessageProcessor
+from .timezones import Timezones
+from . import convert
+from . import error
+from . import utils
 
 class DateConvertCog(commands.Cog):
   """Converts date and time to different timezones"""
 
+  def __init__(self):
+    # load all the timezones on init
+    self._tzs: Timezones = Timezones()
+    self._mp: MessageProcessor = MessageProcessor(self._tzs)
+    #todo: load ids from settings
+    self._timezoneids = ["America/Los_Angeles", "America/New_York","UTC","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"]
+
 
   @commands.command()
-  async def test(self, ctx, *, txt):
+  async def dtconvert(self, ctx, *, txt):
     """Do the conversion"""
-    await ctx.send("ping")
+    txt = txt.strip()
+    msg: str = None
+    if txt == "help":
+      msg = self._help()
+    elif txt == "tz":
+      msg = self._avtzs()
+    else:
+      print("Converting %s" % txt)
+      try:
+        msg = self._doConversion(txt)
+      except error.TimezoneNotFoundError:
+        msg = "The timezone identifier was not found. Please have a look at `!dtconvert tz` for valid identifiers."
+      except error.ParsingError:
+        msg = "Something went wrong while parsing the date and time. Please have a look at `!dtconvert help` for help on formatting."
+      except error.Error:
+        msg = "Uh oh, something went wrong."
+
+    await ctx.send(msg)
+
+
+  def _help(self):
+    msg = """Convert a date and time or only a time with:
+`!dtconvert <date> <time> <timezone>`.
+`<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or ommitted totally.
+`<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used. Please not that there _must_ be a space before am/pm.
+`<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!dtconvert tz`."""
+    return msg
+
+  def _avtzs(self):
+    av = self._tzs.getAvailableAbbreviations()
+    av = ", ".join(av)
+    msg = "Available timezone abbreviations:\n`%s`\nSee also <https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations>" % av
+    return msg
+
+  def _doConversion(self, msg):
+    orig = self._mp.extractDateTime(msg)
+    converted = self._mp.convertDateTime(orig, self._timezoneids)
+    lines = []
+    for conv in converted:
+      date = conv.date
+      time = conv.time
+      line = ""
+      if date:
+        line = "%4i-%02i-%02i " % (date.year, date.month, date.day)
+      ampm = utils.toAmPm(time.hour)
+      line = "%s%02i:%02i (%02i:%02i %s) " % (line, time.hour, time.minute, ampm[0], time.minute, ampm[1])
+      if not date:
+        line = "%s%+i day " % (line, conv.dayShift)
+      line = "%s%s " % (line, conv.timezone.abbr)
+      lines.append(line)
+    return "`%s`" % ("\n".join(lines))
+      

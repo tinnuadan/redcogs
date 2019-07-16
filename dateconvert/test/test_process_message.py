@@ -160,4 +160,21 @@ def test_getDateTimeFailures():
   except Error:
     assert True
 
+def test_api():
+  global _mp
+  mp: process_message.MessageProcessor = _mp
+  orig = mp.extractDateTime("07/14/2019 09:00:00 EDT")
+  conv = mp.convertDateTime(orig, ["America/Los_Angeles", "Europe/Berlin"])
+  assert len(conv) == 2
+  assert conv[0].time.hour == 6
+  assert conv[0].timezone.abbr == "PDT"
+  assert conv[1].time.hour == 15
+  assert conv[1].timezone.abbr == "CEST"
+  
+  #make sure 'orig' is not altered
+  orig = mp.extractDateTime("09 am EDT")
+  conv = mp.convertDateTime(orig, ["America/Los_Angeles", "Europe/Berlin"])
+  assert len(conv) == 2
+  assert conv[0].date == None
+  assert conv[1].date == None
 

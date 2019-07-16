@@ -1,3 +1,4 @@
+import copy
 from typing import List, Dict
 from . import dthandling
 from . import timezones
@@ -13,9 +14,8 @@ class ConvertBase():
     return self.date != None
 
   def toDateTime(self):
-    if not self.date:
-      return None
-    return datetime.datetime(self.date.year, self.date.month, self.date.day, self.time.hour, self.time.minute, self.time.second, 0, self.tzinfo)
+    date = self.date if self.date else dthandling.getToday()
+    return datetime.datetime(date.year, date.month, date.day, self.time.hour, self.time.minute, self.time.second, 0, self.tzinfo)
 
   def _utcStr(self):
     utcoff = self.tzinfo.utcoffset(None).total_seconds()
@@ -36,8 +36,9 @@ class ConvertFrom(ConvertBase):
     return "%s%02i:%02i:%02i%s" % (dateStr, time.hour, time.minute, time.second, self._utcStr())
 
 class ConvertTo(ConvertBase):
-  def __init__(self, date: dthandling.DateObj, time: dthandling.TimeObj, tzinfo: timezones.TzInfo):
+  def __init__(self, date: dthandling.DateObj, time: dthandling.TimeObj, tzinfo: timezones.Timezone):
     ConvertBase.__init__(self, date, time, tzinfo)
+    self.timezone = tzinfo
     self.dayShift = 0
 
   @staticmethod
@@ -54,8 +55,9 @@ class ConvertTo(ConvertBase):
     else:
       return "%02i:%02i:%02i%+s %+i day" % (time.hour, time.minute, time.second, self._utcStr(), self.dayShift)
 
-def convert(cfrom: ConvertFrom, desttz: timezones.Timezone):
+def convert(orig: ConvertFrom, desttz: timezones.Timezone):
   #easy, we have time & date:
+  cfrom = copy.deepcopy(orig)
   if cfrom.canConvertToDateTime():
     dfrom: datetime.datetime  = cfrom.toDateTime()
     dto = dfrom.astimezone(desttz)

@@ -4,6 +4,7 @@ import re
 from typing import List, Dict
 from .timezones import Timezone, Timezones
 from .error import Error, ParsingError, TimezoneNotFoundError
+from .utils import toUnixTime
 from . import dthandling
 from . import convert
 
@@ -13,11 +14,30 @@ class MessageProcessor:
   _reTime: re.Pattern = re.compile(r'^([0-2]?\d)(?::([0-5]\d))?(?::([0-5]\d))?$')
   _reUTC: re.Pattern = re.compile(r'^(\d{4})-([0-1]\d)-([0-3]\d)T([0-2]\d):([0-5]\d):([0-5]\d)([A-Z]+|(?:(?:\+|-)[0-1]\d{1}:?\d{2}))$')
 
-  def __init__(self):
-    self.tzs = Timezones()
+  def __init__(self, tzs: Timezones = None):
+    if tzs:
+      self.tzs = tzs
+    else:
+      self.tzs = Timezones()
 
-  def processMessage(self, msg):
+  def extractDateTime(self, msg: str):
     msg = msg.strip()
+    orig = self._getDateTime(msg)
+    if not orig:
+      raise ParsingError("Unable to extract date and/or time.")
+    return orig
+
+  def convertDateTime(self, orig: convert.ConvertFrom, totimezoneIDs: List):
+    result = []
+    unixorig = toUnixTime(orig.toDateTime())
+    for tzid in totimezoneIDs:
+      tz = self.tzs.getTimezone(tzid, unixorig)
+      if not tz:
+        raise TimezoneNotFoundError("Timezone %s not found" % tzid)
+      res = convert.convert(orig, tz)
+      #print(res)
+      result.append(res)
+    return result
 
   def _getDateTime(self, msg):
     #try for utc first

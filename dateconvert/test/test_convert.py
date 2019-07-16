@@ -25,6 +25,7 @@ def test_convert():
   assert convert_res.time.hour == 6
   assert convert_res.time.minute == 0
   assert convert_res.time.second == 0
+  assert str(convert_res) == "2019-07-14 06:00:00-04:00"
 
   time = dthandling.TimeObj(4,0,0)
   convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo), dest_tz)
@@ -33,6 +34,7 @@ def test_convert():
   assert convert_res.time.minute == 0
   assert convert_res.time.second == 0
   assert convert_res.dayShift == -1
+  assert str(convert_res) == "22:00:00-04:00 -1 day"
 
   dest_tz = tzs.getTimezone("Australia/Brisbane", utils.toUnixTime(convert_from.toDateTime()))
 

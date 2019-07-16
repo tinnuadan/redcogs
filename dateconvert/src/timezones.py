@@ -57,6 +57,19 @@ class Timezones:
     if Timezones._mconn == None:
       self._initDB()
 
+  def getAvailableAbbreviations(self):
+    cur = self._conn().cursor()
+    zones = []
+    for row in cur.execute("""SELECT tz.abbreviation FROM `timezone` tz 
+    WHERE tz.abbreviation NOT LIKE '+%' AND tz.abbreviation NOT LIKE '-%' 
+    GROUP BY tz.abbreviation 
+    ORDER BY tz.abbreviation ASC;"""):
+      zones.append(row[0])
+    zones.append("Z")
+    return zones
+
+
+
   def getTzInfo(self, abbreviation: str):
     if len(abbreviation) == 5 and (abbreviation[0]=="+" or abbreviation[0]=="-"):
       return self._getRawTzOffset(abbreviation)
@@ -76,6 +89,14 @@ class Timezones:
     return TzInfo.Construct(sign * (hours*3600+minutes*60), False)
 
   def getTimezone(self, name: str, unixtime: int):
+    if name == "UTC":
+      tz: Timezone = Timezone.Construct(0, False)
+      tz.id = -1
+      tz.country_code = ""
+      tz.zone_name = "UTC"
+      tz.abbr = "UTC"
+      return tz
+      
     cur = self._conn().cursor()
     cur.execute("""SELECT z.zone_id, z.country_code, z.zone_name, tz.abbreviation, tz.gmt_offset, tz.dst
       FROM `timezone` tz JOIN `zone` z
