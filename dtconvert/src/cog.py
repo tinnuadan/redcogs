@@ -51,11 +51,11 @@ class DTConvertCog(commands.Cog):
 
   def _help(self):
     msg = """Convert a date and time or only a time with:
-`!tz <date> <time> <timezone>`.
+`!tz [<date>] <time> <timezone>`.
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
 `<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
-You can also specifiy everything according to ISO 8601, so `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
+You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg
 
   def _avtzs(self):
