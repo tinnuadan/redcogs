@@ -1,3 +1,4 @@
+import copy
 import datetime
 import enum
 import re
@@ -13,6 +14,7 @@ class MessageProcessor:
   _reDate: re.Pattern = re.compile(r'^([0-3]?[0-9])(?:\/|\.)([0-3]?[0-9])(?:\/|\.)(\d{2}|\d{4})$')
   _reTime: re.Pattern = re.compile(r'^([0-2]?\d)(?::([0-5]\d))?(?::([0-5]\d))?$')
   _reUTC: re.Pattern = re.compile(r'^(\d{4})-([0-1]\d)-([0-3]\d)T([0-2]\d):([0-5]\d):([0-5]\d)([A-Z]+|(?:(?:\+|-)[0-1]\d{1}:?\d{2}))$')
+  _re_ampm_missingSpace: re.Pattern = re.compile(r'[^ ]([aA]\.?[mM]|[pP]\.?[mM])')
 
   def __init__(self, tzs: Timezones = None):
     if tzs:
@@ -45,6 +47,12 @@ class MessageProcessor:
     if res:
       return res
     #go down the more elaborate route...
+    msg = copy.deepcopy(msg)
+    match = MessageProcessor._re_ampm_missingSpace.match(msg)
+    if match: #am/pm with without space in front
+      fnd = match.group(1)
+      msg = msg.replace(fnd, " %s" % fnd)
+
     parts = msg.split(' ') # split on spaces
 
     match = MessageProcessor._reDate.match(parts[0])

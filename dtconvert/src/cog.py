@@ -44,7 +44,7 @@ class DTConvertCog(commands.Cog):
     msg = """Convert a date and time or only a time with:
 `!dtconvert <date> <time> <timezone>`.
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
-`<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used. Please not that there _must_ be a space before am/pm.
+`<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
 `<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!dtconvert tz`.
 You can also specifiy everything according to ISO 8601, so `!dtconvert yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg

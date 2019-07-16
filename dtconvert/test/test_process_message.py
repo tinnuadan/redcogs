@@ -136,7 +136,30 @@ def test_getDateTime():
   assert res.time.second == 0
   assert res.tzinfo.utcoffset(None).total_seconds() == 3600
   assert res.tzinfo._has_dst == False
+  
+  res: convert.ConvertFrom = mp._getDateTime("9am EDT") # no space
+  assert res.date == None
+  assert res.time.hour == 9
+  assert res.tzinfo.utcoffset(None).total_seconds() == -14400 # EDT
+  assert res.tzinfo._has_dst == True # EDT
 
+  res: convert.ConvertFrom = mp._getDateTime("9pm EDT") # no space
+  assert res.date == None
+  assert res.time.hour == 21
+  assert res.tzinfo.utcoffset(None).total_seconds() == -14400 # EDT
+  assert res.tzinfo._has_dst == True # EDT
+
+  res: convert.ConvertFrom = mp._getDateTime("9a.m. EDT") # no space
+  assert res.date == None
+  assert res.time.hour == 9
+  assert res.tzinfo.utcoffset(None).total_seconds() == -14400 # EDT
+  assert res.tzinfo._has_dst == True # EDT
+  
+  res: convert.ConvertFrom = mp._getDateTime("9p.m. EDT") # no space
+  assert res.date == None
+  assert res.time.hour == 21
+  assert res.tzinfo.utcoffset(None).total_seconds() == -14400 # EDT
+  assert res.tzinfo._has_dst == True # EDT
 
 def test_getDateTimeFailures():
   global _mp
@@ -150,12 +173,6 @@ def test_getDateTimeFailures():
     
   try:
     mp._getDateTime("07/14/2019 9am +012")
-    assert False
-  except Error:
-    assert True
-    
-  try:
-    mp._getDateTime("9am EDT")
     assert False
   except Error:
     assert True
