@@ -10,3 +10,9 @@ class TimezoneAbbreviationNotFoundError(Error):
 
 class ParsingError(Error):
   pass
+
+class DateError(Error):
+  pass
+
+class TimeError(Error):
+  pass

@@ -43,6 +43,10 @@ class DTConvertCog(commands.Cog):
         msg = "The timezone identifier was not found. Please have a look at `!tz tz` for valid identifiers."
       except error.ParsingError:
         msg = "Unable to extract date and/or time. Please have a look at `!tz help` for help on formatting."
+      except error.DateError as e:
+        msg = str(e)
+      except error.TimeError as e:
+        msg = str(e)
       except error.Error:
         msg = "Uh oh, something went wrong."
 
