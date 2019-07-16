@@ -34,7 +34,7 @@ class DateConvertCog(commands.Cog):
       except error.TimezoneNotFoundError:
         msg = "The timezone identifier was not found. Please have a look at `!dtconvert tz` for valid identifiers."
       except error.ParsingError:
-        msg = "Something went wrong while parsing the date and time. Please have a look at `!dtconvert help` for help on formatting."
+        msg = "Unable to extract date and/or time. Please have a look at `!dtconvert help` for help on formatting."
       except error.Error:
         msg = "Uh oh, something went wrong."
 
