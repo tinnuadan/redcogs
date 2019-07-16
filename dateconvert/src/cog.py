@@ -15,13 +15,13 @@ class DateConvertCog(commands.Cog):
     self._tzs: Timezones = Timezones()
     self._mp: MessageProcessor = MessageProcessor(self._tzs)
     #todo: load ids from settings
-    self._timezoneids = ["America/Los_Angeles", "America/New_York","UTC","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"]
+    self._timezoneids = ["UTC","America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"]
 
 
   @commands.command()
-  async def dtconvert(self, ctx, *, txt):
-    """Do the conversion"""
-    txt = txt.strip()
+  async def dtconvert(self, ctx, *, datetime):
+    """Converts date and time to multiple timezones"""
+    txt = datetime.strip()
     msg: str = None
     if txt == "help":
       msg = self._help()
@@ -44,9 +44,10 @@ class DateConvertCog(commands.Cog):
   def _help(self):
     msg = """Convert a date and time or only a time with:
 `!dtconvert <date> <time> <timezone>`.
-`<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or ommitted totally.
+`<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used. Please not that there _must_ be a space before am/pm.
-`<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!dtconvert tz`."""
+`<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!dtconvert tz`.
+You can also specifiy everything according to ISO 8601, so `!dtconvert yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg
 
   def _avtzs(self):
