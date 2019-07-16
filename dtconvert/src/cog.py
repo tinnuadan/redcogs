@@ -7,7 +7,7 @@ from . import convert
 from . import error
 from . import utils
 
-class DateConvertCog(commands.Cog):
+class DTConvertCog(commands.Cog):
   """Converts date and time to different timezones"""
 
   def __init__(self):
