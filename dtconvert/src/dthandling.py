@@ -1,4 +1,4 @@
-from .error import Error
+from .error import Error, DateError, TimeError
 import enum
 from typing import List, Dict
 import datetime
@@ -47,7 +47,7 @@ def getDate(fullmatch: str, data: List):
     notation = _DateNotation.ISO
   
   if notation == None:
-    raise Error("No valid date notation found for %s. Please use either dd.mm.yy(yy) or mm/dd/yy(yy)" % fullmatch)
+    raise DateError("No valid date notation found for %s. Please use either dd.mm.yy(yy) or mm/dd/yy(yy)" % fullmatch)
 
   if notation == _DateNotation.ISO:
     year = data[0]
@@ -62,13 +62,13 @@ def getDate(fullmatch: str, data: List):
     year += 2000
   
   if not _inRange(month, 1, 12):
-    raise Error("Month %02i not valid" % month)
+    raise DateError("Month %02i not valid" % month)
   
   dim = _daysPerMonth[month]
   if month == 2 and _isLeapYear(year):
     dim += 1
   if not _inRange(day, 1, dim):
-    raise Error("Day %02i not valid for month %02i" % (day,month))
+    raise DateError("Day %02i not valid for month %02i" % (day,month))
   
   return DateObj(year, month, day)
 
@@ -78,15 +78,15 @@ def getTime(data: List, ampm: str):
   second = data[2] if len(data) > 2 else 0
 
   if ampm != None and not _inRange(hour, 1, 12):
-    raise Error("Hour %02i not valid if am/pm is provided" % hour)
+    raise TimeError("Hour %02i not valid if am/pm is provided" % hour)
   elif not _inRange(hour, 0, 23):
-    raise Error("Hour %02i not valid" % hour)
+    raise TimeError("Hour %02i not valid" % hour)
   
   if not _inRange(minute, 0, 59):
-    raise Error("Minute %02i not valid" % minute)
+    raise TimeError("Minute %02i not valid" % minute)
 
   if not _inRange(second, 0, 59):
-    raise Error("Second %02i not valid" % second)
+    raise TimeError("Second %02i not valid" % second)
 
   if ampm != None:
     if ampm == "am" and hour == 12: #midnight

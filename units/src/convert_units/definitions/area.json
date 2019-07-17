@@ -47,6 +47,7 @@
       "ratio": "1/10.7639"
     },
     "in2": {
+      "aliases": ["sqin"],
       "name": {
         "singular": "Square Inch"
       , "plural": "Square Inches"
@@ -54,6 +55,7 @@
     , "to_anchor": "1/144"
     }
   , "yd2": {
+      "aliases": ["sqyd"],
       "name": {
         "singular": "Square Yard"
       , "plural": "Square Yards"  
@@ -61,6 +63,7 @@
     , "to_anchor": 9
     }
   , "ft2": {
+      "aliases": ["sqft"],
       "name": {
         "singular": "Square Foot"
       , "plural": "Square Feet"
@@ -75,6 +78,7 @@
     , "to_anchor": 43560
     }
   , "mi2": {
+      "aliases": ["sqmi"],
       "name": {
         "singular": "Square Mile"
       , "plural": "Square Miles"
