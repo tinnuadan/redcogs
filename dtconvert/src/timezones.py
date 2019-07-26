@@ -55,17 +55,18 @@ class Timezones:
 
   def __init__(self, file: str = None):
     if Timezones._mconn == None:
-      self._initDB()
+      self._initDB(file)
 
   def getAvailableAbbreviations(self):
     cur = self._conn().cursor()
     zones = []
-    for row in cur.execute("""SELECT tz.abbreviation FROM `timezone` tz 
+    for row in cur.execute("""SELECT tz.abbreviation as abbreviation FROM `timezone` tz 
     WHERE tz.abbreviation NOT LIKE '+%' AND tz.abbreviation NOT LIKE '-%' 
     GROUP BY tz.abbreviation 
+    UNION SELECT 'UTC' as abbreviation
+    UNION SELECT 'Z' as abbreviation
     ORDER BY tz.abbreviation ASC;"""):
       zones.append(row[0])
-    zones.append("Z")
     return zones
 
 

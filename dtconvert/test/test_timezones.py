@@ -49,4 +49,4 @@ def test_loading():
   assert tzs._getRawTzOffset("-0145").utcoffset(None).total_seconds() == -3600-45*60
 
   zones = tzs.getAvailableAbbreviations()
-  assert len(zones) == 119
+  assert len(zones) == 120
