@@ -42,6 +42,9 @@ def test_loading():
   assert tzs.getTimezone("Europe/bsa", 1562853025) == None
   assert tzs.getTzInfo("GNT") == None
 
+  # "Special" zones
+  assert tzs.getTzInfo("UTC").utcoffset(None).total_seconds() == 0
+  assert tzs.getTzInfo("Z").utcoffset(None).total_seconds() == 0
 
   assert tzs._getRawTzOffset("+1000").utcoffset(None).total_seconds() == 10*3600
   assert tzs._getRawTzOffset("-1000").utcoffset(None).total_seconds() == -10*3600

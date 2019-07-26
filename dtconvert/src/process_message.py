@@ -87,8 +87,6 @@ class MessageProcessor:
 
   def _getTzInfo(self, identifier: str):
     tz_str = identifier.replace(":","")
-    if tz_str == "Z": # zulu time == UTC
-      tz_str = "+0000"
     
     tz = self.tzs.getTzInfo(tz_str)
     if not tz:

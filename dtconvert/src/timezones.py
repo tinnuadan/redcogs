@@ -74,6 +74,8 @@ class Timezones:
   def getTzInfo(self, abbreviation: str):
     if len(abbreviation) == 5 and (abbreviation[0]=="+" or abbreviation[0]=="-"):
       return self._getRawTzOffset(abbreviation)
+    if abbreviation in ["UTC", "Z"]:
+      return self._getRawTzOffset("+0000")
     cur = self._conn().cursor()
     cur.execute("""SELECT tz.gmt_offset, tz.dst FROM `timezone` tz 
     WHERE tz.abbreviation=? AND tz.time_start <= ? 
