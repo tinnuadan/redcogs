@@ -20,7 +20,9 @@ class _MatchToProcess:
     value: float = 0
     tmp: str = self.match.group(1)
     if ',' in tmp:
-      tmp = tmp.replace(',', '.')
+      tmp = tmp.replace(',', '')
+    if '\'' in tmp:
+      tmp = tmp.replace('\'', '')
     value = float(tmp)
     return value
 
@@ -37,7 +39,7 @@ class ConversionResult:
     self.conv: str = conv
 
 class MessageProcessor:
-  _re: re.Pattern = re.compile(r'(-?\d+(?:,|\.)?\d*)\s*?([\w\/\'"]+)')
+  _re: re.Pattern = re.compile(r'\b(-?[\d,\']+\.?\d*)\s*?([\w\/\'"]+)\b')
   _special: Dict = None
 
   def __init__(self):

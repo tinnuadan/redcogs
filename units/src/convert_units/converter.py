@@ -17,7 +17,7 @@ class ConversionResult:
     self.measure: Measure = measure
 
   def __str__(self):
-    return "%.2f %s" % (self.value, self.measure.unit)
+    return f"{self.value:,.2f} {self.measure.unit}"
 
   def toBest(self):
     """  Looks through every possibility for the 'best' available unit.
