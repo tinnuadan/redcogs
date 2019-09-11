@@ -39,7 +39,7 @@ class ConversionResult:
     self.conv: str = conv
 
 class MessageProcessor:
-  _re: re.Pattern = re.compile(r'\b(-?[\d,]+\.?\d*)\s?([\w\/\'"]+)\b')
+  _re: re.Pattern = re.compile(r'(-?[\d,]+\.?\d*)\s?([\w\/\'"]+)')
   _special: Dict = None
 
   def __init__(self):
