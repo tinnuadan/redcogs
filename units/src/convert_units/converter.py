@@ -78,12 +78,12 @@ class Conversion:
     result_measure: Measure = to.anchor.measure
     return ConversionResult(result, result_measure)
 
-  def convertTo(self, value: float, to: Measure):
+  def convertTo(self, value: float, to: Measure, ignoreParents: bool = False):
     print("Converting %s to %s" % (self.base_measure.unit, to.unit))
     result: float = 0
 
     #parents must be the same
-    if self.base_measure.parent != to.parent:
+    if not ignoreParents and self.base_measure.parent != to.parent:
       raise Exception("Parents must be the same")
   
     # to anchor

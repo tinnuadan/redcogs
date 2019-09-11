@@ -4,6 +4,7 @@ import re
 from typing import List, Dict
 from .convert_units import converter
 from .convert_units import measurements
+from .error import Error
 
 class _MatchToProcess:
   def __init__(self, match, conversion: converter.Conversion):
@@ -32,6 +33,7 @@ class _ToConvert:
     self.composedMTP: _MatchToProcess = composedMTP
     self.separator: str = separator
     self.is_composed: bool = composedMTP != None
+    self.override_to_conversion: converter.Conversion = None
 
 class ConversionResult:
   def __init__(self, orig, conv):
@@ -40,6 +42,7 @@ class ConversionResult:
 
 class MessageProcessor:
   _re: re.Pattern = re.compile(r'(-?[\d,]+\.?\d*)\s?([\w\/\'"]+)')
+  _reTo: re.Pattern = re.compile(r'to\s([\w\/\'"]+)$')
   _special: Dict = None
 
   def __init__(self):
@@ -59,6 +62,7 @@ class MessageProcessor:
       return sp
     matches = self._findMatches(msg)
     composed = self._findComposed(matches, msg)
+    composed = self._findTo(composed, msg)
     converted = self._processToConvert(composed)
     return converted
 
@@ -112,6 +116,27 @@ class MessageProcessor:
       else:
         result.append(_ToConvert(cur))
     return result
+
+  def _findTo(self, toconvert, msg):
+    # find 'val unit to unit'
+    if len(toconvert) == 1: # only works for exaclty one conversion
+      curelement: _ToConvert = toconvert[0]
+      mtp: _MatchToProcess = curelement.matchToProcess if not curelement.is_composed else curelement.composedMTP
+      substr: str = msg[mtp.match.end():].strip()
+      m = self._reTo.match(substr) # if we match "to <unit>" at the end of the string
+      if m:
+        conversion = converter.findConversion(m.group(1)) # and have a valid conversion
+        if conversion:
+          origConv = curelement.matchToProcess.conversion
+          if origConv.conversion.metric == conversion.conversion.metric:
+            curelement.override_to_conversion = conversion
+            return [curelement] # return the new list
+          else:
+            unit_from = origConv.base_measure.name
+            unit_to = conversion.base_measure.name
+            raise Error(f"Unable to convert from {unit_from} to {unit_to}")
+    return toconvert
+
       
   def _processToConvert(self, matchToProcess):
     toReplace: List = []
@@ -123,10 +148,16 @@ class MessageProcessor:
       if toConv.is_composed:
         val += toConv.composedMTP.convertTo(toConv.matchToProcess.conversion.base_measure).value
 
-      result: converter.ConversionResult = toConv.matchToProcess.conversion.convert(val)
+      result: converter.ConversionResult = None
+      result = toConv.matchToProcess.conversion.convert(val)
       orig: str = str( converter.ConversionResult(val, toConv.matchToProcess.conversion.base_measure) )
 
-      if toConv.matchToProcess.conversion.conversion.convertToBest:
+      if toConv.override_to_conversion != None:
+        if toConv.override_to_conversion.base_measure.parent == toConv.matchToProcess.conversion.base_measure:
+          result = toConv.matchToProcess.conversion.convertTo(val, toConv.override_to_conversion.base_measure)
+        else:
+          result = toConv.matchToProcess.conversion.convertTo(result.value, toConv.override_to_conversion.base_measure, True)
+      elif toConv.matchToProcess.conversion.conversion.convertToBest:
         result = result.toBest()
 
       conv: str = str(result)
