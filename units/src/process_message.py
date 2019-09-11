@@ -134,7 +134,7 @@ class MessageProcessor:
           else:
             unit_from = origConv.base_measure.name
             unit_to = conversion.base_measure.name
-            raise Error(f"Unable to convert from {unit_from} to {unit_to}")
+            raise Error(f"Unable to convert from {unit_from.lower()} to {unit_to.lower()}")
     return toconvert
 
       
