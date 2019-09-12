@@ -69,7 +69,15 @@ class Timezones:
       zones.append(row[0])
     return zones
 
-
+  def getTzID(self, name):
+    cur = self._conn().cursor()
+    cur.execute("""SELECT z.zone_id, z.country_code, z.zone_name
+      FROM `zone` z
+      WHERE z.zone_name=? COLLATE NOCASE""", [name])
+    row = cur.fetchone()
+    if not row:
+      return None
+    return int(row[0])
 
   def getTzInfo(self, abbreviation: str):
     if len(abbreviation) == 5 and (abbreviation[0]=="+" or abbreviation[0]=="-"):
@@ -106,6 +114,31 @@ class Timezones:
       ON tz.zone_id=z.zone_id
       WHERE tz.time_start <= ? AND z.zone_name=?
       ORDER BY tz.time_start DESC LIMIT 1;""", [unixtime, name])
+    row = cur.fetchone()
+    if not row:
+      return None
+    tz: Timezone = Timezone.Construct(int(row[4]), int(row[5])==1)
+    tz.id = int(row[0])
+    tz.country_code = row[1]
+    tz.zone_name = row[2]
+    tz.abbr = row[3]
+    return tz
+
+  def getTimezoneByID(self, id: int, unixtime: int):
+    if id == 0:
+      tz: Timezone = Timezone.Construct(0, False)
+      tz.id = -1
+      tz.country_code = ""
+      tz.zone_name = "UTC"
+      tz.abbr = "UTC"
+      return tz
+      
+    cur = self._conn().cursor()
+    cur.execute("""SELECT z.zone_id, z.country_code, z.zone_name, tz.abbreviation, tz.gmt_offset, tz.dst
+      FROM `timezone` tz JOIN `zone` z
+      ON tz.zone_id=z.zone_id
+      WHERE tz.time_start <= ? AND z.zone_id=?
+      ORDER BY tz.time_start DESC LIMIT 1;""", [unixtime, id])
     row = cur.fetchone()
     if not row:
       return None
