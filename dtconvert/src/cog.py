@@ -1,6 +1,7 @@
 from redbot.core import Config, commands
 import discord
 import typing
+import datetime
 from .process_message import MessageProcessor
 from .timezones import Timezones
 from . import convert
@@ -29,7 +30,7 @@ class DTConvertCog(commands.Cog):
 
   @commands.command()
   async def t(self, ctx, *, datetime):
-    msg = await self._tz(ctx, datetime)
+    msg = await self._tz(ctx, datetime) 
     await ctx.send(msg)
 
   async def _tz(self, ctx, datetime):
@@ -82,9 +83,28 @@ You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss
     return msg
 
   def _doConversion(self, msg, tzid: int):
-    orig = self._mp.extractDateTime(msg, tzid)
-    converted = self._mp.convertDateTime(orig, self._timezoneids)
+    orig: convert.ConvertFrom = self._mp.extractDateTime(msg, tzid)
+    tzids = list(self._timezoneids)
+    if tzid and not orig.tz_set_explictly:
+      tzinfo = self._tzs.getTimezoneByID(tzid, 0)
+      print(tzinfo.zone_name)
+      if tzinfo:
+        tzids.insert(0, tzinfo.zone_name)
+    elif tzid and orig.tz_set_explictly:
+      tzinfo = self._tzs.getTimezoneByID(tzid, 0)
+      print(tzinfo.zone_name)
+      if tzinfo:
+        tzids.append(tzinfo.zone_name)
+    
+    converted = self._mp.convertDateTime(orig, tzids)
+    
+    dnow = datetime.datetime.now()
+    convutc = converted[0]
+    converted = sorted(converted[1:], key = lambda x: x.tzinfo.utcoffset(dnow))
+    converted.insert(0, convutc)
+
     lines = []
+    line0 = None
     for conv in converted:
       date = conv.date
       time = conv.time
@@ -96,6 +116,12 @@ You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss
       if not date:
         line = "%s%+i day " % (line, conv.dayShift)
       line = "%s%s " % (line, conv.timezone.abbr)
-      lines.append(line)
+      if not line0:
+        line0 = line
+        lines.append(line)
+        if not orig.tz_set_explictly:
+          lines.append("---")
+      if line not in lines:
+        lines.append(line)
     return "```HTTP\n%s```" % ("\n".join(lines))
       

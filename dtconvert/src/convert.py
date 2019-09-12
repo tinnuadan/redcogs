@@ -24,8 +24,9 @@ class ConvertBase():
     return "%+03i:%02i" % (tzhours, tzminutes)
 
 class ConvertFrom(ConvertBase):
-  def __init__(self, date: dthandling.DateObj, time: dthandling.TimeObj, tzinfo: timezones.TzInfo):
+  def __init__(self, date: dthandling.DateObj, time: dthandling.TimeObj, tzinfo: timezones.TzInfo, tz_set_explictly):
     ConvertBase.__init__(self, date, time, tzinfo)
+    self.tz_set_explictly = tz_set_explictly
 
   def __str__(self):
     dateStr = ""
@@ -71,7 +72,7 @@ def convert(orig: ConvertFrom, desttz: timezones.Timezone):
   res.date = None
   #get day shift
   if dto.day != dfrom.day:
-    dfromInDest = ConvertFrom(cfrom.date, cfrom.time, desttz).toDateTime() # treat the original date as it would be in the same tz as the destination
+    dfromInDest = ConvertFrom(cfrom.date, cfrom.time, desttz, True).toDateTime() # treat the original date as it would be in the same tz as the destination
     direction = (dto - dfromInDest).total_seconds()
     res.dayShift = 1 if direction > 0 else -1
   

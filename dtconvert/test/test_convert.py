@@ -13,7 +13,7 @@ def test_convert():
   date = dthandling.DateObj(2019,7,14)
 
   tzinfo = tzs.getTzInfo("CEST")
-  convert_from = convert.ConvertFrom(date, time, tzinfo)
+  convert_from = convert.ConvertFrom(date, time, tzinfo, True)
 
   dest_tz = tzs.getTimezone("America/New_York", utils.toUnixTime(convert_from.toDateTime()))
 
@@ -28,7 +28,7 @@ def test_convert():
   assert str(convert_res) == "2019-07-14 06:00:00-04:00"
 
   time = dthandling.TimeObj(4,0,0)
-  convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo), dest_tz)
+  convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo, True), dest_tz)
   assert convert_res.date == None
   assert convert_res.time.hour == 22
   assert convert_res.time.minute == 0
@@ -39,7 +39,7 @@ def test_convert():
   dest_tz = tzs.getTimezone("Australia/Brisbane", utils.toUnixTime(convert_from.toDateTime()))
 
   time = dthandling.TimeObj(18,0,0)
-  convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo), dest_tz)
+  convert_res = convert.convert(convert.ConvertFrom(None, time, tzinfo, True), dest_tz)
   assert convert_res.date == None
   assert convert_res.time.hour == 2
   assert convert_res.time.minute == 0
@@ -52,7 +52,7 @@ def test_differentDaylightSaving():
   date = dthandling.DateObj(2019,10,30) # standard time in europe, still daylight saving in us
 
   tzinfo = tzs.getTzInfo("CET")
-  convert_from = convert.ConvertFrom(date, time, tzinfo)
+  convert_from = convert.ConvertFrom(date, time, tzinfo, True)
 
   dest_tz = tzs.getTimezone("America/New_York", utils.toUnixTime(convert_from.toDateTime()))
 
@@ -68,7 +68,7 @@ def test_differentDaylightSaving():
   date = dthandling.DateObj(2019,11,4) # standard time in europe & us
 
   tzinfo = tzs.getTzInfo("CET")
-  convert_from = convert.ConvertFrom(date, time, tzinfo)
+  convert_from = convert.ConvertFrom(date, time, tzinfo, True)
 
   dest_tz = tzs.getTimezone("America/New_York", utils.toUnixTime(convert_from.toDateTime()))
 
