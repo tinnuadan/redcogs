@@ -1,4 +1,5 @@
 from redbot.core import commands
+import traceback
 from .process_message import MessageProcessor, ConversionResult
 from .convert_units.converter import loadConversionsData
 from .error import Error
@@ -33,3 +34,4 @@ class UnitCog(commands.Cog):
       await ctx.send(answer)
     except Exception as e:
       print("Exception was thrown while trying to process the message: %s" % e)
+      traceback.print_exc()

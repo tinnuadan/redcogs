@@ -2,7 +2,9 @@ import json
 from typing import Dict, List
 
 
-class Measure():  
+class Measure():
+  """ A single measure (e.g. kg). Contains the conversion to the anchor, the unit, name, aliases and the parent Measurement collection"""
+
   def __init__(self, parent):
     self.unit: str = ""
     self.aliases: List = []
@@ -12,13 +14,14 @@ class Measure():
     self.parent: Measurement = parent
 
   def __str__(self):
-    aliases = self.aliases
+    aliases = list(self.aliases)
     aliases.remove(self.name)
     res = "%s (%s). Also known as %s. To anchor: %.2f. Anchor shift: %.2f" %(self.unit, self.name, ", ".join(aliases), self.to_anchor, self.anchor_shift)
     return res
 
 
 class Anchor():
+  """ Holds which Measure is used as the anchor of a Measurement """
   def __init__(self):
     self.measure: Measure = None
     self.ratio: float = 1
@@ -26,6 +29,8 @@ class Anchor():
 
 
 class Measurement():
+  """ Holds a collection of measures (metric or imperial), which have a common anchor they can be converted to """
+
   def __init__(self, name: str):
     self.name: str = name
     self.anchor: Anchor = Anchor()

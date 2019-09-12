@@ -153,10 +153,23 @@ class MessageProcessor:
       orig: str = str( converter.ConversionResult(val, toConv.matchToProcess.conversion.base_measure) )
 
       if toConv.override_to_conversion != None:
-        if toConv.override_to_conversion.base_measure.parent == toConv.matchToProcess.conversion.base_measure:
+        print("forced conversion")
+        
+        if toConv.override_to_conversion.base_measure.parent == toConv.matchToProcess.conversion.base_measure.parent:
+          # if the parents are the same (i.e. imperial -> imperial or metric -> metric)
           result = toConv.matchToProcess.conversion.convertTo(val, toConv.override_to_conversion.base_measure)
         else:
-          result = toConv.matchToProcess.conversion.convertTo(result.value, toConv.override_to_conversion.base_measure, True)
+          # otherwise we convert first from imperial to metric or vice versa
+          # (which we already did implicitly)
+          
+          # take the forced conversion
+          conv: converter.Conversion = toConv.override_to_conversion
+          # we take the base_measure of the forced conversion
+          to_measure: measurements.Measure = conv.base_measure
+          # and replace it in the class with the measure of the conversion result
+          conv.base_measure = result.measure
+          # and convert the whole thing
+          result = conv.convertTo(result.value, to_measure)
       elif toConv.matchToProcess.conversion.conversion.convertToBest:
         result = result.toBest()
 
