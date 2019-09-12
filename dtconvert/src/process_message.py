@@ -3,7 +3,7 @@ import datetime
 import enum
 import re
 from typing import List, Dict
-from .timezones import Timezone, Timezones
+from .timezones import Timezone, Timezones, TzInfo
 from .error import Error, ParsingError, TimezoneNotFoundError
 from .utils import toUnixTime
 from . import dthandling
@@ -22,9 +22,9 @@ class MessageProcessor:
     else:
       self.tzs = Timezones()
 
-  def extractDateTime(self, msg: str):
+  def extractDateTime(self, msg: str, usertzid: int = None):
     msg = msg.strip()
-    orig = self._getDateTime(msg)
+    orig = self._getDateTime(msg, usertzid)
     if not orig:
       raise ParsingError("Unable to extract date and/or time.")
     return orig
@@ -41,7 +41,7 @@ class MessageProcessor:
       result.append(res)
     return result
 
-  def _getDateTime(self, msg):
+  def _getDateTime(self, msg, usertzid: int):
     #try for utc first
     res: datetime.datetime = self._tryUTC(msg)
     if res:
@@ -81,16 +81,21 @@ class MessageProcessor:
       time = dthandling.getMidnight()
 
     tz = self._getTzInfo(parts[-1].upper())
+    tz_set = tz!=None
+    if tz == None and usertzid != None:
+      tdate: datetime.date = date if date else dthandling.getToday()
+      tz = self.tzs.getTimezoneByID(usertzid, toUnixTime( datetime.datetime(tdate.year, tdate.month, tdate.day, tzinfo = TzInfo.Construct(0, False))))
+    if not tz:
+      print("No timezone for %s found and now timezone was set" % parts[-1].upper())
+      raise TimezoneNotFoundError("No timezone for %s found and now timezone was set" % parts[-1].upper())
 
-    return convert.ConvertFrom(date, time, tz)
+    return convert.ConvertFrom(date, time, tz, tz_set)
 
 
   def _getTzInfo(self, identifier: str):
     tz_str = identifier.replace(":","")
     
     tz = self.tzs.getTzInfo(tz_str)
-    if not tz:
-      raise TimezoneNotFoundError("No timezone for %s found" % identifier)
     return tz
 
 
@@ -100,12 +105,14 @@ class MessageProcessor:
     match = MessageProcessor._reUTC.match(msg)
     if match:
       tz = self._getTzInfo(match.group(7))
+      if tz == None:
+        raise TimezoneNotFoundError("No valid timezone found")
       data = list(map(lambda x: int(x), match.group(1, 2, 3, 4, 5, 6)))
       
       date = dthandling.getDate("%04i-%02i-%02i" % tuple(data[0:3]), data[0:3])
       time = dthandling.getTime(data[3:6], None)
 
-      result = convert.ConvertFrom(date, time, tz)
+      result = convert.ConvertFrom(date, time, tz, True)
     return result
 
 
