@@ -41,7 +41,7 @@ class DTConvertCog(commands.Cog):
       msg = self._help()
     elif txt == "tz":
       msg = self._avtzs()
-    elif txt[0:2] == "me":
+    elif txt[0:2] == "me" and False: # TODO: enable again some time
       tmp = txt.split(" ")
       if len(tmp) == 1:
         msg = await usercfg.get_user_tz(ctx, self._config, self._tzs)
@@ -73,10 +73,7 @@ class DTConvertCog(commands.Cog):
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
 `<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
-You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`.
-Set or view a your personal timezone via
-`!tz me <timezone>` where `timezone` should be Continent/City.
-`!tz me clear` will clear it again"""
+You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg
 
   def _avtzs(self):
