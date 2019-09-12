@@ -79,7 +79,7 @@ You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss
       if date:
         line = "%4i-%02i-%02i " % (date.year, date.month, date.day)
       ampm = utils.toAmPm(time.hour)
-      line = "%s%02i:%02i (%02i:%02i %s) " % (line, time.hour, time.minute, ampm[0], time.minute, ampm[1])
+      line = "%s%02i:%02i (%2i:%02i %s) " % (line, time.hour, time.minute, ampm[0], time.minute, ampm[1])
       if not date:
         line = "%s%+i day " % (line, conv.dayShift)
       line = "%s%s " % (line, conv.timezone.abbr)
