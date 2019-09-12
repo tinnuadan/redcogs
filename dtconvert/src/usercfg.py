@@ -23,6 +23,10 @@ async def get_user_tz(ctx: commands.Context, cfg: Config, tzs: Timezones):
 
 async def set_user_tz(ctx: commands.Context, cfg: Config, tzs: Timezones, name: str):
   """ tries to set's the users timezone, sends an error if the identifer is not found """
+  if name.lower() == "clear":
+    await cfg.user(ctx.message.author).usertz.set(None)
+    return f"Successfully cleared your timezone."
+
   id = tzs.getTzID(name)
   if not id:
     return "Unrecognized timezone. Try `tz set Continent/City`: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>"

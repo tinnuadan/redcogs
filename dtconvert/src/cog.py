@@ -48,7 +48,7 @@ class DTConvertCog(commands.Cog):
       elif len(tmp) == 2:
         msg = await usercfg.set_user_tz(ctx, self._config, self._tzs, tmp[1])
       else:
-        msg = "Error in syntax. Try `!tz me [timezone]` to view or set your timezone"
+        msg = "Error in syntax. Try `!tz me <timezone>` to view or set your timezone"
     else:
       try:
         tzid = await usercfg.get_user_tzid(ctx, self._config)
@@ -73,7 +73,10 @@ class DTConvertCog(commands.Cog):
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
 `<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
-You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
+You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`.
+Set or view a your personal timezone via
+`!tz me <timezone>` where `timezone` should be Continent/City.
+`!tz me clear` will clear it again"""
     return msg
 
   def _avtzs(self):
