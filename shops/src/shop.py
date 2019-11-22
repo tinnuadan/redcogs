@@ -7,10 +7,10 @@ class Shop:
     super().__init__()
     self._id = id
     self._name = name
-    self._owner = owner
-    self._items = items
+    self._owner: List = owner
+    self._items: Dict = items
     self._coords = coords
     self._post = post
 
   def getDynmapUrl(self):
-    return "http://patreon.docm77.de:8123/?worldname=DocsWorldTour&mapname=flat&zoom=5&x%s&&z=%s" % (self._coords._x, self._coords._z)
+    return self._coords.getDynmapUrl()
