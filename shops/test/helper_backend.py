@@ -6,6 +6,9 @@ class HelperBackend(BackendInterface):
   def __init__(self):
     super().__init__()
 
+  def getShop(self, id):
+    return Shop(id=id)
+
   def addShop(self, shop: Shop) -> typing.Union[None, Shop]:
     return shop
 
