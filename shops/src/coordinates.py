@@ -19,6 +19,8 @@ class Coordinates:
 
   @staticmethod
   def fromString(representation: str):
+    if representation == None:
+      return Coordinates()
     tmp = list(map(lambda v: v.strip(), str.strip().split(",")))
     tmp = list(map(lambda v: None if v=="?" else int(v), tmp))
     return Coordinates(tmp[0], tmp[1], tmp[2])
