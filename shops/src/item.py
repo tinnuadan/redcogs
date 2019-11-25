@@ -5,3 +5,11 @@ class Item:
     self.id = id
     self.name = name
     self.price = price
+
+  def isSame(self, other):
+    myself = self.__dict__
+    theother = other.__dict__
+    for key in myself:
+      if myself[key] != theother[key]:
+        return False
+    return True
