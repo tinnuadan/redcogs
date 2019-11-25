@@ -90,7 +90,7 @@ class SqliteBackend(BackendInterface):
       items.append((shop.id, itm.name, itm.price))
     if len(items) > 0:
       cur.executemany("""INSERT INTO `items` (`shop_id`,`name`,`price`) VALUES(?,?,?)""", items)
-
+    self._db.commit()
     return self.getShop(shop.id)
 
   def updateShop(self, oldValue: Shop, newValue: Shop):
@@ -106,18 +106,27 @@ class SqliteBackend(BackendInterface):
     shop = newValue
     cur: sqlite3.Cursor = self._c
     owner = ",".join(shop.owner) if shop.owner != None else None
-    cur.execute("""UPDATE `shops` `name`=?, `owner`=?, `coordinates`=?, `world`=?, `post`=?
-      WHERE `shop_id`=?""", (shop.name, owner, shop.coords, shop.coords.world, shop.post, shop.id))
+    cur.execute("""UPDATE `shops` SET `name`=?, `owner`=?, `coordinates`=?, `world`=?, `post`=?
+      WHERE `shop_id`=?""", (shop.name, owner, shop.coords, shop.coords.world, shop.post, oldValue.id))
     
-    itemsRemoved = list(filter(lambda x: not newValue.hasItem(x), oldValue.items)) # old has them, new not
+    removedItems = list(filter(lambda x: not newValue.hasItem(x), oldValue.items)) # old has them, new not
     newItems = list(filter(lambda x: not oldValue.hasItem(x), newValue.items))     # new has them, old not
     existingItems = list(filter(lambda x: oldValue.hasItem(x), newValue.items))    # both have them
 
+    # remove old
+    for itm in removedItems:
+      cur.execute("DELETE FROM `items` WHERE `item_id`=:id", (itm.id,))
+    # update existing old
+    for itm in removedItems:
+      cur.execute("UPDATE `items` SET `name`=?, `price`=? WHERE `item_id`=?", (itm.name, itm.price, itm.id))
+    # insert new
     items: typing.List[Item] = []
     for itm in newItems:
-      items.append((shop.id, itm.name, itm.price))
+      items.append((oldValue.id, itm.name, itm.price))
     if len(items) > 0:
       cur.executemany("""INSERT INTO `items` (`shop_id`,`name`,`price`) VALUES(?,?,?)""", items)
+    self._db.commit()
+    return self.getShop(oldValue.id)
 
     
 
