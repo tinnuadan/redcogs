@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Union
 from .item import Item
 from .coordinates import Coordinates
 
@@ -14,6 +14,15 @@ class Shop:
 
   def getDynmapUrl(self):
     return self.coords.getDynmapUrl()
+
+  def hasItem(self, item: Item) -> bool:
+    return self.getItem(item.id) != None
+
+  def getItem(self, id: int) -> Union[None, Item]:
+    for itm in self.items:
+      if itm.id == id:
+        return itm
+    return None
 
   def isSame(self, other):
     simpleCheck = ['id','name','owner','post']

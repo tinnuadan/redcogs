@@ -65,6 +65,7 @@ class SqliteBackend(BackendInterface):
     cur.execute("SELECT * FROM `shops` WHERE `shop_id`=:id", {"id": id})
     row = cur.fetchone()
     if not row:
+      logging.getLogger(__name__).error(f"The shop with the id {id} was not found")
       return None
     owner = row['owner'].split(",") if row['owner'] else None
     shop = Shop(row['name'], owner, [], row['coordinates'], row['post'], row['shop_id'])
@@ -87,11 +88,39 @@ class SqliteBackend(BackendInterface):
     items: typing.List[Item] = []
     for itm in shop.items:
       items.append((shop.id, itm.name, itm.price))
-    
     if len(items) > 0:
       cur.executemany("""INSERT INTO `items` (`shop_id`,`name`,`price`) VALUES(?,?,?)""", items)
+
+    return self.getShop(shop.id)
+
+  def updateShop(self, oldValue: Shop, newValue: Shop):
+    if oldValue.id <= 0:
+      logging.getLogger(__name__).error(f"The shop id {oldValue.id} is not valid")
+      return None
+    if self.getShop(oldValue.id) == None:
+      return None
+    if oldValue.isSame(newValue):
+      logging.getLogger(__name__).info(f"Nothing changed")
+      return newValue
+
+    shop = newValue
+    cur: sqlite3.Cursor = self._c
+    owner = ",".join(shop.owner) if shop.owner != None else None
+    cur.execute("""UPDATE `shops` `name`=?, `owner`=?, `coordinates`=?, `world`=?, `post`=?
+      WHERE `shop_id`=?""", (shop.name, owner, shop.coords, shop.coords.world, shop.post, shop.id))
     
-    return shop
+    itemsRemoved = list(filter(lambda x: not newValue.hasItem(x), oldValue.items)) # old has them, new not
+    newItems = list(filter(lambda x: not oldValue.hasItem(x), newValue.items))     # new has them, old not
+    existingItems = list(filter(lambda x: oldValue.hasItem(x), newValue.items))    # both have them
+
+    items: typing.List[Item] = []
+    for itm in newItems:
+      items.append((shop.id, itm.name, itm.price))
+    if len(items) > 0:
+      cur.executemany("""INSERT INTO `items` (`shop_id`,`name`,`price`) VALUES(?,?,?)""", items)
+
+    
+
 
 
 
