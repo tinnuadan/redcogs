@@ -29,3 +29,16 @@ def test_item():
   assert item.isSame(item2)
   item2.id = 10
   assert not item.isSame(item2)
+
+def test_shop():
+  shop = Shop("Test", ["Luci"], [Item("Potion", "1 Diamond")], Coordinates(10,11,12, World.Overworld), "discord", 4)
+  shop2 = Shop("Test", ["Luci"], [Item("Potion", "1 Diamond")], Coordinates(10,11,12, World.Overworld), "discord", 4)
+  assert shop.name == "Test"
+  assert len(shop.owner) == 1 and shop.owner[0] == "Luci"
+  assert len(shop.items) == 1 and shop.items[0].isSame(Item("Potion", "1 Diamond"))
+  assert shop.coords.isSame(Coordinates(10,11,12, World.Overworld))
+  assert shop.post == "discord"
+  assert shop.id == 4
+  assert shop.isSame(shop2)
+  shop.owner[0] = "Bean"
+  assert not shop.isSame(shop2)
