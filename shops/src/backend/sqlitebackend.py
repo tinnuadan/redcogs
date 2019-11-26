@@ -115,9 +115,9 @@ class SqliteBackend(BackendInterface):
 
     # remove old
     for itm in removedItems:
-      cur.execute("DELETE FROM `items` WHERE `item_id`=:id", (itm.id,))
-    # update existing old
-    for itm in removedItems:
+      cur.execute("DELETE FROM `items` WHERE `item_id`=?", (itm.id,))
+    # update existing
+    for itm in existingItems:
       cur.execute("UPDATE `items` SET `name`=?, `price`=? WHERE `item_id`=?", (itm.name, itm.price, itm.id))
     # insert new
     items: typing.List[Item] = []
@@ -127,6 +127,22 @@ class SqliteBackend(BackendInterface):
       cur.executemany("""INSERT INTO `items` (`shop_id`,`name`,`price`) VALUES(?,?,?)""", items)
     self._db.commit()
     return self.getShop(oldValue.id)
+
+  def deleteShop(self, shop: Shop) -> bool:
+    todelete = self.getShop(shop.id)
+    if todelete == None:
+      logging.getLogger(__name__).warning(f"Unable to delete the shop \"{shop.nam}\" because it's id wasn't found")
+      return False
+    
+    #remove items:
+    cur: sqlite3.Cursor = self._c
+    cur.execute("DELETE FROM `items` WHERE `shop_id`=?", (todelete.id,))
+    cur.execute("DELETE FROM `shops` WHERE `shop_id`=?", (todelete.id,))
+    self._db.commit()
+    return True
+  
+
+
 
     
 
