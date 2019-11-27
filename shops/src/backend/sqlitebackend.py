@@ -67,7 +67,7 @@ class SqliteBackend(BackendInterface):
     if not row:
       logging.getLogger(__name__).error(f"The shop with the id {id} was not found")
       return None
-    owner = row['owner'].split(",") if row['owner'] else None
+    owner = row['owner'].split(",") if row['owner'] else []
     shop = Shop(row['name'], owner, [], row['coordinates'], row['post'], row['shop_id'])
     cur.execute("SELECT * FROM `items` WHERE `shop_id`=:id ORDER BY `name` ASC", {"id": shop.id})
     while True:
@@ -128,7 +128,7 @@ class SqliteBackend(BackendInterface):
     self._db.commit()
     return self.getShop(oldValue.id)
 
-  def deleteShop(self, shop: Shop) -> bool:
+  def removeShop(self, shop) -> bool:
     todelete = self.getShop(shop.id)
     if todelete == None:
       logging.getLogger(__name__).warning(f"Unable to delete the shop \"{shop.nam}\" because it's id wasn't found")

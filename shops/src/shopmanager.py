@@ -16,11 +16,11 @@ class ShopManager(BackendInterface):
   def addShop(self, shop: Shop) -> typing.Union[None, Shop]:
     return self._backend.addShop(shop)
 
-  def removeShop(self, shop: Shop) -> typing.Union[None, Shop]:
+  def removeShop(self, shop: Shop) -> bool:
     return self._backend.removeShop(shop)
 
-  def editShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
-    return self._backend.editShop(currentShop, newShop)
+  def updateShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
+    return self._backend.updateShop(currentShop, newShop)
 
   def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
     return self._backend.searchShop(needle, where)

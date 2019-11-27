@@ -18,10 +18,10 @@ class BackendInterface:
   def addShop(self, shop: Shop) -> typing.Union[None, Shop]:
     return None
 
-  def removeShop(self, shop: Shop) -> typing.Union[None, Shop]:
-    return None
+  def removeShop(self, shop: Shop) -> bool:
+    return False
 
-  def editShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
+  def updateShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
     return None
 
   def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
