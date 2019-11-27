@@ -15,7 +15,7 @@ class HelperBackend(BackendInterface):
   def removeShop(self, shop: Shop) -> typing.Union[None, Shop]:
     return shop
 
-  def editShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
+  def updateShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
     return newShop
 
   def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:

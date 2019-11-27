@@ -10,6 +10,6 @@ def test_shopmanager():
   otherShop = Shop()
   assert shop == mgr.addShop(shop)
   assert shop == mgr.removeShop(shop)
-  assert otherShop == mgr.editShop(shop, otherShop)
+  assert otherShop == mgr.updateShop(shop, otherShop)
   assert None == mgr.searchShop("nothing", SearchKey.Any)
   assert mgr.getShop(10).id == 10
