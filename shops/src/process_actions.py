@@ -49,7 +49,7 @@ def _action_update(mgr, action: Action):
     return Reply.CreateError(f"Unable to update the shop \"{shop.name}\"")
   
 def _action_remove(mgr, action: Action, confirm):
-  id = _pop_id(action.payload)
+  id = action.payload['id']
   shop = mgr.getShop(id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
@@ -60,7 +60,7 @@ def _action_remove(mgr, action: Action, confirm):
     else:
       return Reply.CreateError(f"Unable to remove the shop \"{shop.name}\"")
   else:
-    return Reply.CreateConfirmation("Are you sure you want to remove the shop \"{shop.name}\"?")
+    return Reply.CreateConfirmation(f"Are you sure you want to remove the shop \"{shop.name}\"?")
 
 # helpers
 T = typing.TypeVar('T')
