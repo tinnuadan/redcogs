@@ -80,8 +80,8 @@ def parse_message(msg):
   subparsers = parser.add_subparsers(dest='action_name')
   parser_add = subparsers.add_parser("add", help="Add a shop.",formatter_class=CustomHelpFormatter)
   parser_add.add_argument('name', type=str, help='The name of the shop')
-  parser_add.add_argument('-o', '--owner', nargs='+', type=str, help='The owner[s] of the shop. You can specify multiple.')
-  parser_add.add_argument('-i', '--item', nargs='+', type=str, help='The sold item[s] in the shop. You can specify multiple and add a price by doing \'item:price\'')
+  parser_add.add_argument('-o', '--owner', action='append', type=str, help='The owner[s] of the shop. You can specify multiple.')
+  parser_add.add_argument('-i', '--item', action='append', type=str, help='The sold item[s] in the shop. You can specify multiple and add a price by doing \'item:price\'')
   parser_add.add_argument('-x', default=None, type=str, help='x-coordinate of the location of the shop')
   parser_add.add_argument('-y', default=None, type=str, help='y-coordinate of the location of the shop')
   parser_add.add_argument('-z', default=None, type=str, help='z-coordinate of the location of the shop')
@@ -99,11 +99,11 @@ def parse_message(msg):
   parser_remove = subparsers.add_parser("remove", help="Remove a shop.", formatter_class=CustomHelpFormatter)
   parser_remove.add_argument('id', type=int, help='The id of the shop')
 
-  parser_edit = subparsers.add_parser("edit", help="Edit a shop. Only provided values will be changed.")
+  parser_edit = subparsers.add_parser("update", help="Edit a shop. Only provided values will be changed.")
   parser_edit.add_argument('id', type=int, help='the id of the shop')
-  parser_edit.add_argument('-n', '--name', default=None, type=str, help='sthe name of the shop')
-  parser_edit.add_argument('-o', '--owner', nargs='+', type=str, help='the owner of the shop')
-  parser_edit.add_argument('-i', '--item', nargs='+', type=str, help='the owner of the shop')
+  parser_edit.add_argument('-n', '--name', default=None, type=str, help='the name of the shop')
+  parser_edit.add_argument('-o', '--owner', action='append', type=str, help='the owner of the shop')
+  parser_edit.add_argument('-i', '--item', action='append', type=str, help='the owner of the shop')
   parser_edit.add_argument('-x', default=None, type=str, help='x-coordinate of the location of the shop')
   parser_edit.add_argument('-y', default=None, type=str, help='y-coordinate of the location of the shop')
   parser_edit.add_argument('-z', default=None, type=str, help='z-coordinate of the location of the shop')
@@ -125,16 +125,23 @@ def parse_message(msg):
 
   #setup getting the message
   CustomArgParser.vfile = io.StringIO()
-  args = parser.parse_args(shlex.split(msg))
-  message = CustomArgParser.vfile.getvalue()
+  args = None
+  try:
+    args = parser.parse_args(shlex.split(msg))
+    message = CustomArgParser.vfile.getvalue()
+  except TypeError:
+    message = "Invalid command\n"
+    message += parser.get_usage()
+    pass
   CustomArgParser.vfile.close()
   CustomArgParser.vfile = None
 
   if message != "":
     return actions.Action(actions.ActionType.help, message)
   
+  args = vars(args)
   action_name = args['action_name'].replace("-","_")
-  return actions.Action(actions.ActionType[args[action_name]], args)
+  return actions.Action(actions.ActionType[action_name], args)
 
 
 
