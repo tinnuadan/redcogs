@@ -95,6 +95,7 @@ def parse_message(msg):
 
   parser_show = subparsers.add_parser("show", help="Show verbose shop details", formatter_class=CustomHelpFormatter)
   parser_show.add_argument('id', type=int, help='The id of the shop')
+  parser_show.add_argument('-v', '--verbose', action='store_true', help='Show more details')
 
   subparsers.add_parser("list", help="List all shops.", formatter_class=CustomHelpFormatter)
 
@@ -109,7 +110,7 @@ def parse_message(msg):
   parser_edit.add_argument('-x', default=None, type=str, help='x-coordinate of the location of the shop')
   parser_edit.add_argument('-y', default=None, type=str, help='y-coordinate of the location of the shop')
   parser_edit.add_argument('-z', default=None, type=str, help='z-coordinate of the location of the shop')
-  parser_add.add_argument('-w', '--world', default=None, type=int, help='world (1: overworld, 2: nether, 3: end)')
+  parser_edit.add_argument('-w', '--world', default=None, type=int, help='world (1: overworld, 2: nether, 3: end)')
 
   parser_add_item = subparsers.add_parser("add-item", help="Add an item to a shop.",formatter_class=CustomHelpFormatter)
   parser_add_item.add_argument('shop-id', type=int, help='the id of the shop')

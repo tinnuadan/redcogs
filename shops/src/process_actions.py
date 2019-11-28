@@ -36,16 +36,24 @@ def process_action(manager: ShopManager, action: Action, confirmed: bool = False
 
 
 def _action_show(mgr, action: Action):
+  def item_to_str(item, verbose):
+    res = f"{item.name}"
+    if verbose:
+      res += f" (ID {item.id})"
+    if item.price:
+      res += f" sold for {item.price}"
+    return res
+
   id = _pop_id(action.payload)
   shop = mgr.getShop(id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
+  verbose = action.payload['verbose']
   owner = ", ".join(shop.owner)
-  items = "\n".join(list(map(lambda x: f"{x.id}: {x.name} for {x.price}", shop.items)))
+  items = "\n".join(list(map(lambda x: item_to_str(x, verbose), shop.items)))
   if len(shop.items) == 0:
     items = "No items sold yet"
-  # msg = f"Shop: {shop.name}\nOwner: {owner}\nItems:\n{items}"
-  res = Reply.CreateEmbed(None, f"{shop.name} ({shop.id})")
+  res = Reply.CreateEmbed(None, f"{shop.name} (ID {shop.id})" if verbose else f"{shop.name}")
   embed: Embed = res.embed
   embed.add_field(name="Owner", value=owner, inline=True)
   embed.add_field(name="Location", value=str(shop.coords), inline=True)
