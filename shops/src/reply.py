@@ -22,7 +22,7 @@ class Reply:
   @embed.setter
   def embed(self, embed):
     self._embed = embed
-    if self._embed.description == discord.Embed.Empty:
+    if self._embed.description == discord.Embed.Empty and self.message != None:
       self._embed.description = self.message
 
   @staticmethod

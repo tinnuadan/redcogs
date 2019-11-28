@@ -1,6 +1,7 @@
 from typing import List, Dict, Union
 from .item import Item
 from .coordinates import Coordinates
+from copy import deepcopy
 
 class Shop:
   def __init__(self, name: str = "", owner: List = None, items: List = [], coords: Coordinates = Coordinates(), post: str = None, id: int = -1):
@@ -11,6 +12,16 @@ class Shop:
     self.items: List = list(items)
     self.coords = coords
     self.post = post
+
+  def clone(self):
+    res = Shop()
+    res.name = deepcopy(self.name)
+    res.owner = list(self.owner)
+    res.coords = deepcopy(self.coords)
+    res.post = deepcopy(self.post)
+    for itm in self.items:
+      res.items.append(deepcopy(itm))
+    return res
 
   def getDynmapUrl(self):
     return self.coords.getDynmapUrl()
