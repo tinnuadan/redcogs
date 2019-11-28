@@ -13,6 +13,7 @@ class Coordinates:
     self.z = z
     self.world = world
 
+  @property
   def isValid(self):
     return self.x != None and self.z != None
   

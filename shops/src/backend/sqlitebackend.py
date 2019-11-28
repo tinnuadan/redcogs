@@ -20,10 +20,10 @@ def _convert_coordinates(s: str):
   return Coordinates.fromString(s.decode('utf-8'))
 
 def _adapt_world(world: World):
-  return world.name.encode("utf-8")
+  return world.value
 
-def _convert_world(s: str):
-  return World[s.decode('utf-8')]
+def _convert_world(id):
+  return World(int(id))
   
 
 sqlite3.register_adapter(Coordinates, _adapt_coordinates)
@@ -43,7 +43,7 @@ class SqliteBackend(BackendInterface):
 `name` TEXT,
 `owner` TEXT,
 `coordinates` `coordinates` TEXT,
-`world` `world` TEXT,
+`world` `world` INTEGER,
 `post` TEXT
 );"""]
   _TBL_ITEMS: str = "items"

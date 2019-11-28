@@ -1,5 +1,6 @@
 import typing
 import copy
+from discord import Embed
 
 from .actions import Action, ActionType
 from .coordinates import Coordinates, World
@@ -40,9 +41,22 @@ def _action_show(mgr, action: Action):
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
   owner = ", ".join(shop.owner)
-  items = ", ".join(list(map(lambda x: f"\t{x.id}: {x.name} for {x.price}\n", shop.items)))
-  msg = f"Shop: {shop.name}\nOwner: {owner}\nItems:\n{items}"
-  return Reply.CreateEmbed(msg, f"Details for {shop.name}")
+  items = "\n".join(list(map(lambda x: f"{x.id}: {x.name} for {x.price}", shop.items)))
+  if len(shop.items) == 0:
+    items = "No items sold yet"
+  # msg = f"Shop: {shop.name}\nOwner: {owner}\nItems:\n{items}"
+  res = Reply.CreateEmbed(None, f"{shop.name} ({shop.id})")
+  embed: Embed = res.embed
+  embed.add_field(name="Owner", value=owner, inline=True)
+  embed.add_field(name="Location", value=str(shop.coords), inline=True)
+  embed.add_field(name="World", value=str(shop.coords.world), inline=True)
+  embed.add_field(name="Sold Items", value=items, inline=False)
+  if shop.post != None:
+    embed.add_field(name="Announcenment Post", value=shop.post, inline=False)
+  if shop.coords.isValid:
+    embed.add_field(name="Show on Dynmap", value=shop.coords.getDynmapUrl(), inline=False)
+  return res
+
 
 def _action_list(mgr, action: Action):
   list = mgr.list()
@@ -50,7 +64,9 @@ def _action_list(mgr, action: Action):
   for shop in list:
      msg.append(f"{shop.id:3}: {shop.name}")
   s="\n".join(msg)
-  return Reply.CreatePlain(f"```{s}```")#``, f"List of all shops")
+  if len(msg) > 0:
+    return Reply.CreatePlain(f"```{s}```")#``, f"List of all shops")
+  return Reply.CreatePlain("No shops created yet")
 
 
 def _action_add(mgr, action: Action):
@@ -67,7 +83,7 @@ def _action_update(mgr, action: Action):
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
   shop_updated = mgr.updateShop(shop, _clone_shop_if_not_set(shop, action.payload))
-  if not shop_updated:
+  if shop_updated:
     return Reply.CreateSuccess(f"The shop \"{shop.name}\" was updated")
   else:
     return Reply.CreateError(f"Unable to update the shop \"{shop.name}\"")
@@ -175,12 +191,22 @@ def _clone_shop_if_not_set(shop: Shop, payload: typing.Dict):
   coords.x = _get_or_default(payload, 'x', shop.coords.x)
   coords.y = _get_or_default(payload, 'y', shop.coords.y)
   coords.z = _get_or_default(payload, 'z', shop.coords.z)
-  coords.world = _get_or_default(payload, 'z', shop.coords.world)
+  coords.world = _get_or_default(payload, 'world', shop.coords.world)
 
   res = Shop()
   res.name = _get_or_default(payload, 'name', shop.name)
   res.coords = coords
   res.owner = _get_or_default(payload, 'owner', shop.owner)
+  items = _get_or_default(payload, 'item', [])
+  if len(items) != 0:
+    for itm_str in items:
+      tmp = itm_str.split(":")
+      pl = { 'name': tmp[0]}
+      if len(tmp)==2:
+        pl['price'] = tmp[1]
+      res.items.append(_create_item(pl))
+  else:
+    res.items = shop.items
   return res
 
 def _clone_item_if_not_set(item: Item, payload: typing.Dict):
