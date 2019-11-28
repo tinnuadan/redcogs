@@ -3,12 +3,12 @@ from .item import Item
 from .coordinates import Coordinates
 
 class Shop:
-  def __init__(self, name: str = "", owner: List = None, items: Dict = [], coords: Coordinates = Coordinates(), post: str = None, id: int = -1):
+  def __init__(self, name: str = "", owner: List = None, items: List = [], coords: Coordinates = Coordinates(), post: str = None, id: int = -1):
     super().__init__()
     self.id = id
     self.name = name
     self.owner: List = owner
-    self.items: Dict = items
+    self.items: List = list(items)
     self.coords = coords
     self.post = post
 

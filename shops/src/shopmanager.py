@@ -24,3 +24,6 @@ class ShopManager(BackendInterface):
 
   def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
     return self._backend.searchShop(needle, where)
+
+  def getItem(self, id):
+    return self._backend.getItem(id)

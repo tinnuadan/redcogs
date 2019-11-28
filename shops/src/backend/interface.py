@@ -1,6 +1,7 @@
 import typing
 import enum
 from ...src.shop import Shop
+from ...src.item import Item
 
 class SearchKey(enum.Enum):
   Any = 1
@@ -25,6 +26,9 @@ class BackendInterface:
     return None
 
   def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
+    return None
+
+  def getItem(self, id: int) -> typing.Union[None, Item]:
     return None
 
   
