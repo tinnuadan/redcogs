@@ -31,4 +31,5 @@ class BackendInterface:
   def getItem(self, id: int) -> typing.Union[None, Item]:
     return None
 
-  
+  def list(self) -> typing.List:
+    return []

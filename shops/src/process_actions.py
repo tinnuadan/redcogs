@@ -15,8 +15,6 @@ def process_action(manager: ShopManager, action: Action, confirmed: bool = False
   type = action.type
   if type == ActionType.add:
     return _action_add(mgr, action)
-  if type == ActionType.show:
-    return _action_show(mgr, action)
   if type == ActionType.update:
     return _action_update(mgr, action)
   if type == ActionType.remove:
@@ -27,16 +25,14 @@ def process_action(manager: ShopManager, action: Action, confirmed: bool = False
     return _action_update_item(mgr, action)
   if type == ActionType.remove_item:
     return _action_remove_item(mgr, action, confirmed)
-  
+  if type == ActionType.show:
+    return _action_show(mgr, action)
+  if type == ActionType.list:
+    return _action_list(mgr, action)
+
   return Reply.CreateError("Action not found")
 
-def _action_add(mgr, action: Action):
-  shop = _create_shop(action.payload)
-  shop = mgr.addShop(shop)
-  if shop:
-    return Reply.CreateSuccess(f"New shop \"{shop.name}\" with id \"{shop.id}\" added.")
-  else:
-    return Reply.CreateError(f"Unable to add the new shop")
+
 
 def _action_show(mgr, action: Action):
   id = _pop_id(action.payload)
@@ -47,6 +43,23 @@ def _action_show(mgr, action: Action):
   items = ", ".join(list(map(lambda x: f"\t{x.id}: {x.name} for {x.price}\n", shop.items)))
   msg = f"Shop: {shop.name}\nOwner: {owner}\nItems:\n{items}"
   return Reply.CreateEmbed(msg, f"Details for {shop.name}")
+
+def _action_list(mgr, action: Action):
+  list = mgr.list()
+  msg = []
+  for shop in list:
+     msg.append(f"{shop.id:3}: {shop.name}")
+  s="\n".join(msg)
+  return Reply.CreatePlain(f"```{s}```")#``, f"List of all shops")
+
+
+def _action_add(mgr, action: Action):
+  shop = _create_shop(action.payload)
+  shop = mgr.addShop(shop)
+  if shop:
+    return Reply.CreateSuccess(f"New shop \"{shop.name}\" with id \"{shop.id}\" added.")
+  else:
+    return Reply.CreateError(f"Unable to add the new shop")
 
 def _action_update(mgr, action: Action):
   id = _pop_id(action.payload)
@@ -143,8 +156,7 @@ def _create_shop(payload: typing.Dict):
   res.name = _get_or_default(payload, 'name', '')
   res.coords = coords
   res.owner = _get_or_default(payload, 'owner', [])
-  items = payload['item']
-  for itm_str in items:
+  for itm_str in _get_or_default(payload, 'item', []):
     tmp = itm_str.split(":")
     pl = { 'name': tmp[0]}
     if len(tmp)==2:

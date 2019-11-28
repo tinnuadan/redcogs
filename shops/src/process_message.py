@@ -96,6 +96,8 @@ def parse_message(msg):
   parser_show = subparsers.add_parser("show", help="Show verbose shop details", formatter_class=CustomHelpFormatter)
   parser_show.add_argument('id', type=int, help='The id of the shop')
 
+  subparsers.add_parser("list", help="List all shops.", formatter_class=CustomHelpFormatter)
+
   parser_remove = subparsers.add_parser("remove", help="Remove a shop.", formatter_class=CustomHelpFormatter)
   parser_remove.add_argument('id', type=int, help='The id of the shop')
 

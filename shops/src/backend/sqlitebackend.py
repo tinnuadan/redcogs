@@ -1,6 +1,7 @@
 import sqlite3
 import logging
 import typing
+import copy
 from .interface import BackendInterface
 from ..shop import Shop
 from ..item import Item
@@ -61,6 +62,35 @@ class SqliteBackend(BackendInterface):
       self._c.execute(statement)
     self._db.commit()
 
+  def _row2shop(self, row: typing.List) -> Shop:
+    owner = row['owner'].split(",") if row['owner'] else []
+    shop = Shop(row['name'], owner, [], row['coordinates'], row['post'], row['shop_id'])
+    return shop
+
+  def _row2item(self, row: typing.List, shop: Shop = None) -> Item:
+    return Item(row['name'], row['price'], row['item_id'], shop)
+
+  def list(self):
+    cur: sqlite3.Cursor = self._c
+    cur.execute("SELECT * FROM `shops` ORDER BY `name` ASC")
+    shops = {}
+    while True:
+      row = cur.fetchone()
+      if not row:
+        break
+      shop = self._row2shop(row)
+      shops[shop.id] = copy.deepcopy(shop)
+    cur.execute("SELECT * FROM `items` ORDER BY `name` ASC")
+    while True:
+      row = cur.fetchone()
+      if not row:
+        break
+      shop = shops[row['shop_id']]
+      item = self._row2item(row, shop)
+      shop.items.append(copy.deepcopy(item))
+    return shops.values()
+
+
   def getShop(self, id: int):
     cur: sqlite3.Cursor = self._c
     cur.execute("SELECT * FROM `shops` WHERE `shop_id`=:id", {"id": id})
@@ -68,14 +98,14 @@ class SqliteBackend(BackendInterface):
     if not row:
       logging.getLogger(__name__).error(f"The shop with the id {id} was not found")
       return None
-    owner = row['owner'].split(",") if row['owner'] else []
-    shop = Shop(row['name'], owner, [], row['coordinates'], row['post'], row['shop_id'])
+    shop = self._row2shop(row)
     cur.execute("SELECT * FROM `items` WHERE `shop_id`=:id ORDER BY `name` ASC", {"id": shop.id})
     while True:
       row = cur.fetchone()
       if not row:
         break
-      shop.items.append(Item(row['name'], row['price'], row['item_id'], shop))
+      item = self._row2item(row, shop)
+      shop.items.append(item)
     return shop
     
   def addShop(self, shop: Shop):

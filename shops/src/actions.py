@@ -6,6 +6,7 @@ class ActionType(enum.Enum):
   remove = enum.auto()
   show = enum.auto()
   search = enum.auto()
+  list = enum.auto()
   add_item = enum.auto()
   update_item = enum.auto()
   remove_item = enum.auto()
