@@ -212,6 +212,7 @@ def _create_shop(payload: typing.Dict):
   res.name = _get_or_default(payload, 'name', '')
   res.coords = coords
   res.owner = _get_or_default(payload, 'owner', [])
+  res.post = _get_or_default(payload, 'post', None)
   for itm_str in _get_or_default(payload, 'item', []):
     tmp = itm_str.split(":")
     pl = { 'name': tmp[0]}
@@ -237,6 +238,7 @@ def _clone_shop_if_not_set(shop: Shop, payload: typing.Dict):
   res.name = _get_or_default(payload, 'name', shop.name)
   res.coords = coords
   res.owner = _get_or_default(payload, 'owner', shop.owner)
+  res.post = _get_or_default(payload, 'post', shop.post)
   items = _get_or_default(payload, 'item', [])
   if len(items) != 0:
     for itm_str in items:
