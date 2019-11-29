@@ -30,12 +30,43 @@ def process_action(manager: ShopManager, action: Action, confirmed: bool = False
     return _action_show(mgr, action)
   if type == ActionType.list:
     return _action_list(mgr, action)
+  if type == ActionType.search:
+    return _action_search(mgr, action)
 
   return Reply.CreateError("Action not found")
 
+def _action_search(mgr, action: Action):
+  needle = None
+  searchKey = SearchKey.Any
+  pl = action.payload
+  if _get_or_default(pl, 'needle') != None:
+    needle = pl['needle']
+  elif _get_or_default(pl, 'name') != None:
+    needle = pl['name']
+    searchKey = SearchKey.Name
+  elif _get_or_default(pl, 'owner') != None:
+    needle = pl['owner']
+    searchKey = SearchKey.Owner
+  elif _get_or_default(pl, 'item') != None:
+    needle = pl['item']
+    searchKey = SearchKey.Items
+  result = mgr.searchShop(needle, searchKey)
+  if len(result) > 5:
+    return Reply.CreateError("The search returned more than 5 results. Please specify your search.")
+  if len(result) == 0:
+    return Reply.CreatePlain("Nothing matched your search criteria.")
+  res = []
+  for r in result:
+    res.append(_do_action_show(mgr, r.id, False))
+  return res
 
 
 def _action_show(mgr, action: Action):
+  id = _pop_id(action.payload)
+  verbose = action.payload['verbose']
+  return _do_action_show(mgr, id, verbose)
+
+def _do_action_show(mgr, id, verbose):
   def item_to_str(item, verbose):
     res = f"{item.name}"
     if verbose:
@@ -44,18 +75,21 @@ def _action_show(mgr, action: Action):
       res += f" sold for {item.price}"
     return res
 
-  id = _pop_id(action.payload)
   shop = mgr.getShop(id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
-  verbose = action.payload['verbose']
-  owner = ", ".join(shop.owner)
+  owner = "N.N."
+  if len(shop.owner) != 0 and shop.owner != None:
+    owner = ", ".join(shop.owner)
   items = "\n".join(list(map(lambda x: item_to_str(x, verbose), shop.items)))
   if len(shop.items) == 0:
     items = "No items sold yet"
   res = Reply.CreateEmbed(None, f"{shop.name} (ID {shop.id})" if verbose else f"{shop.name}")
   embed: Embed = res.embed
+  print(embed)
+  print(owner)
   embed.add_field(name="Owner", value=owner, inline=True)
+  print(embed)
   embed.add_field(name="Location", value=str(shop.coords), inline=True)
   embed.add_field(name="World", value=str(shop.coords.world), inline=True)
   embed.add_field(name="Sold Items", value=items, inline=False)

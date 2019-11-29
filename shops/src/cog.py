@@ -37,10 +37,13 @@ class ShopsCog(commands.Cog):
       await menu(ctx, [reply.embed], controls)
     else:
       reply = process_action(self._mgr, action, False)
-      if reply.embed != None:
-        await ctx.send(embed = reply.embed)
-      else:
-        await ctx.send(reply.message)
+      if not isinstance(reply, list):
+        reply = [reply]
+      for r in reply:
+        if r.embed != None:
+          await ctx.send(embed = r.embed)
+        else:
+          await ctx.send(r.message)
 
   async def _confirm_action(self, ctx, pages, controls, message, page, timeout, emoji):
     await self._remove_reactions(ctx, pages, controls, message, page, timeout, emoji)

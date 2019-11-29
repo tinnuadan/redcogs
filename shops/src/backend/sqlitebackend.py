@@ -2,7 +2,7 @@ import sqlite3
 import logging
 import typing
 import copy
-from .interface import BackendInterface
+from .interface import BackendInterface, SearchKey
 from ..shop import Shop
 from ..item import Item
 from ..coordinates import Coordinates, World
@@ -185,6 +185,40 @@ class SqliteBackend(BackendInterface):
     shop = self.getShop(row['shop_id'])
     return shop.getItem(id)
   
+  def searchShop(self, needle, where) -> typing.List[Shop]:
+    def _append_if_not_exists(list, shop):
+      for s in list:
+        if s.isSame(shop):
+          return
+      list.append(shop)
+    res = []
+    cur: sqlite3.Cursor = self._c
+    # search for name
+    if where == SearchKey.Name or where == SearchKey.Any:
+      cur.execute("SELECT * FROM `shops` WHERE `name` LIKE ? ORDER BY `name` ASC ", (f"%{needle}%",))
+      while True:
+        row = cur.fetchone()
+        if not row:
+          break
+        _append_if_not_exists(res, self._row2shop(row))
+    # search for owner
+    if where == SearchKey.Owner or where == SearchKey.Any:
+      cur.execute("SELECT * FROM `shops` ASC WHERE `owner` LIKE ? ORDER BY `name`", (f"%{needle}%",))
+      while True:
+        row = cur.fetchone()
+        if not row:
+          break
+        _append_if_not_exists(res, self._row2shop(row))
+    # search for items
+    if where == SearchKey.Items or where == SearchKey.Any:
+      cur.execute("SELECT * FROM `items` WHERE `name` LIKE ? ORDER BY `name`", (f"%{needle}%",))
+      while True:
+        row = cur.fetchone()
+        if not row:
+          break
+        shop = self.getShop(row['shop_id'])
+        _append_if_not_exists(res, shop)
+    return res
 
 
 

@@ -4,11 +4,11 @@ from .coordinates import Coordinates
 from copy import deepcopy
 
 class Shop:
-  def __init__(self, name: str = "", owner: List = None, items: List = [], coords: Coordinates = Coordinates(), post: str = None, id: int = -1):
+  def __init__(self, name: str = "", owner: List = [], items: List = [], coords: Coordinates = Coordinates(), post: str = None, id: int = -1):
     super().__init__()
     self.id = id
     self.name = name
-    self.owner: List = owner
+    self.owner: List = list(owner)
     self.items: List = list(items)
     self.coords = coords
     self.post = post

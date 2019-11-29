@@ -25,7 +25,7 @@ class BackendInterface:
   def updateShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
     return None
 
-  def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
+  def searchShop(self, needle: str, where: SearchKey) -> typing.List[Shop]:
     return None
 
   def getItem(self, id: int) -> typing.Union[None, Item]:
