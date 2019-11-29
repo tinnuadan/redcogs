@@ -32,7 +32,7 @@ class Coordinates:
 
   def __str__(self):
     xyz = list(map(lambda v: "?" if v == None else str(v), [self.x, self.y, self.z]))
-    return ",".join(xyz)
+    return ", ".join(xyz)
 
   @staticmethod
   def fromString(representation: str):

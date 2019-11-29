@@ -184,6 +184,15 @@ class SqliteBackend(BackendInterface):
       return None
     shop = self.getShop(row['shop_id'])
     return shop.getItem(id)
+
+  def updateItem(self, currentItem, newItem):
+    cur: sqlite3.Cursor = self._c
+    if currentItem.isSame(newItem):
+      return True
+    cur.execute("UPDATE `items` SET `name`=:name, `price`=:price WHERE `item_id`=:id", {"id": currentItem.id, 'name': newItem.name, 'price': newItem.price})
+    self._db.commit()
+    updated = self.getItem(currentItem.id)
+    return updated.name == newItem.name and updated.price == newItem.price
   
   def searchShop(self, needle, where) -> typing.List[Shop]:
     def _append_if_not_exists(list, shop):

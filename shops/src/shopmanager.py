@@ -28,5 +28,8 @@ class ShopManager(BackendInterface):
   def getItem(self, id):
     return self._backend.getItem(id)
 
+  def updateItem(self, currentItem, newItem):
+    return self._backend.updateItem(currentItem, newItem)
+
   def list(self) -> typing.List:
     return self._backend.list()

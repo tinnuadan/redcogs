@@ -38,6 +38,7 @@ def process_action(manager: ShopManager, action: Action, confirmed: bool = False
 def _action_search(mgr, action: Action):
   needle = None
   searchKey = SearchKey.Any
+  verbose = action.payload['verbose']
   pl = action.payload
   if _get_or_default(pl, 'needle') != None:
     needle = pl['needle']
@@ -57,7 +58,7 @@ def _action_search(mgr, action: Action):
     return Reply.CreatePlain("Nothing matched your search criteria.")
   res = []
   for r in result:
-    res.append(_do_action_show(mgr, r.id, False))
+    res.append(_do_action_show(mgr, r.id, verbose))
   return res
 
 
@@ -68,7 +69,7 @@ def _action_show(mgr, action: Action):
 
 def _do_action_show(mgr, id, verbose):
   def item_to_str(item, verbose):
-    res = f"{item.name}"
+    res = f"\u2022 {item.name}"
     if verbose:
       res += f" (ID {item.id})"
     if item.price:
@@ -164,12 +165,9 @@ def _action_update_item(mgr, action: Action):
   if item_orig == None:
     return Reply.CreateError(f"Item with the id {id} not found")
   item_new = _clone_item_if_not_set(item_orig, action.payload)
-  item_orig.name = item_new.name
-  item_orig.price = item_new.price
-  shop = item_orig.shop
-  shop_updated = mgr.updateShop(shop, shop)
-  if shop_updated != None:
-    return Reply.CreateSuccess(f"The item \"{item_orig.name}\" (belonging to \"{shop.name}\") was updated")
+  updated = mgr.updateItem(item_orig, item_new)
+  if updated:
+    return Reply.CreateSuccess(f"The item \"{item_orig.name}\" (belonging to \"{item_orig.shop.name}\") was updated")
   else:
     return Reply.CreateError(f"Unable to update the item \"{item_orig.name}\"")
 

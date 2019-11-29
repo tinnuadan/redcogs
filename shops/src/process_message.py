@@ -92,6 +92,7 @@ def parse_message(msg):
   parser_find.add_argument('-n', '--name', default=None, type=str, help='Search for NAME in the name of the shop')
   parser_find.add_argument('-o', '--owner', default=None, type=str, help='Search for OWNER')
   parser_find.add_argument('-i', '--item', default=None, type=str, help='Search for ITEM')
+  parser_find.add_argument('-v', '--verbose', action='store_true', help='Show more details')
 
   parser_show = subparsers.add_parser("show", help="Show verbose shop details", formatter_class=CustomHelpFormatter)
   parser_show.add_argument('id', type=int, help='The id of the shop')

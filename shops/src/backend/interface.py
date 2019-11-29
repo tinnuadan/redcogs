@@ -31,5 +31,8 @@ class BackendInterface:
   def getItem(self, id: int) -> typing.Union[None, Item]:
     return None
 
+  def updateItem(self, currentItem: Item, newItem: Item) -> bool:
+    return False
+
   def list(self) -> typing.List:
     return []
