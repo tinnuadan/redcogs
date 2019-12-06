@@ -10,7 +10,7 @@ class ShopManager(BackendInterface):
     super().__init__()
     self._backend = backend
 
-  def getShop(self, id):
+  def getShop(self, id: typing.Union[int, str]):
     return self._backend.getShop(id)
 
   def addShop(self, shop: Shop) -> typing.Union[None, Shop]:

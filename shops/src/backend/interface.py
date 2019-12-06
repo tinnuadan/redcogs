@@ -13,7 +13,7 @@ class BackendInterface:
   def __init__(self):
     super().__init__()
 
-  def getShop(self, id: int) -> typing.Union[None, Shop]:
+  def getShop(self, id: typing.Union[int, str]) -> typing.Union[None, Shop]:
     return None
 
   def addShop(self, shop: Shop) -> typing.Union[None, Shop]:

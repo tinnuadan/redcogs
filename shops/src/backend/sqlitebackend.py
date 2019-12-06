@@ -91,9 +91,12 @@ class SqliteBackend(BackendInterface):
     return shops.values()
 
 
-  def getShop(self, id: int):
+  def getShop(self, id: typing.Union[int, str]):
     cur: sqlite3.Cursor = self._c
-    cur.execute("SELECT * FROM `shops` WHERE `shop_id`=:id", {"id": id})
+    if isinstance(id, int):
+      cur.execute("SELECT * FROM `shops` WHERE `shop_id`=:id", {"id": id})
+    else:
+      cur.execute("SELECT * FROM `shops` WHERE `name` LIKE :name", {"name": id})
     row = cur.fetchone()
     if not row:
       logging.getLogger(__name__).error(f"The shop with the id {id} was not found")
