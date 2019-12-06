@@ -93,6 +93,11 @@ class SqliteBackend(BackendInterface):
 
   def getShop(self, id: typing.Union[int, str]):
     cur: sqlite3.Cursor = self._c
+    try:
+      id = int(id)
+    except ValueError:
+      pass
+
     if isinstance(id, int):
       cur.execute("SELECT * FROM `shops` WHERE `shop_id`=:id", {"id": id})
     else:

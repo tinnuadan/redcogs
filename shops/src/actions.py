@@ -1,6 +1,7 @@
 import enum
 
 class ActionType(enum.Enum):
+  ERROR = enum.auto()
   add = enum.auto()
   update = enum.auto()
   remove = enum.auto()
@@ -25,3 +26,7 @@ class Action:
   @property
   def isHelp(self) -> bool:
     return self.type == ActionType.help
+
+  @property
+  def isError(self) -> bool:
+    return self.type == ActionType.ERROR

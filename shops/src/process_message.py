@@ -3,6 +3,7 @@ from typing import List, Dict
 import io
 import shlex
 from . import actions
+from . import error
 
 class CustomHelpFormatter(argparse.HelpFormatter):
   def __init__(self,
@@ -132,18 +133,28 @@ def parse_message(msg):
   #setup getting the message
   CustomArgParser.vfile = io.StringIO()
   args = None
+  isError = False
   try:
     args = parser.parse_args(shlex.split(msg))
     message = CustomArgParser.vfile.getvalue()
   except TypeError:
-    message = "Invalid command\n"
+    message = "Invalid command.\n"
     message += parser.get_usage()
+    isError = True
+    pass
+  except ValueError as e:
+    message = "Error while parsing the command:\n"
+    message += str(e)
+    isError = True
     pass
   CustomArgParser.vfile.close()
   CustomArgParser.vfile = None
 
   if message != "":
     return actions.Action(actions.ActionType.help, message)
+
+  if isError:
+    return actions.Action(actions.ActionType.ERROR, message)
   
   args = vars(args)
   action_name = args['action_name'].replace("-","_")
