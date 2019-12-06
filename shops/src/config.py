@@ -22,4 +22,8 @@ class Config:
   @property
   def databaseuri(self):
     return Config._config['databaseuri']
+
+  @property
+  def logging(self):
+    return Config._config['logging']
       
