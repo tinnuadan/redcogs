@@ -6,6 +6,7 @@ import typing
 import logging
 
 from .actions import Action, ActionType
+from .config import Config
 from .shopmanager import ShopManager
 from .backend import sqlitebackend
 from .process_message import parse_message
@@ -19,7 +20,8 @@ class ShopsCog(commands.Cog):
   def __init__(self):
     super().__init__()
     logging.getLogger(__name__).setLevel(logging.INFO)
-    self._mgr = ShopManager(sqlitebackend.SqliteBackend(":memory:"))
+    self._config = Config()
+    self._mgr = ShopManager(sqlitebackend.SqliteBackend(self._config.databaseuri))
     self._lastAction = None
 
   @commands.command()
