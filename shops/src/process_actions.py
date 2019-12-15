@@ -3,7 +3,7 @@ import copy
 from discord import Embed
 
 from .actions import Action, ActionType
-from .coordinates import Coordinates, World
+from .coordinates import Coordinates, World, World2Str
 from .shopmanager import ShopManager, SearchKey
 from .shop import Shop
 from .backend import sqlitebackend
@@ -92,7 +92,7 @@ def _do_action_show(mgr, id, verbose):
   embed.add_field(name="Owner", value=owner, inline=True)
   print(embed)
   embed.add_field(name="Location", value=str(shop.coords), inline=True)
-  embed.add_field(name="World", value=str(shop.coords.world), inline=True)
+  embed.add_field(name="World", value=World2Str(shop.coords.world), inline=True)
   embed.add_field(name="Sold Items", value=items, inline=False)
   if shop.post != None:
     embed.add_field(name="Announcenment Post", value=shop.post, inline=False)

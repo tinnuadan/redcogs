@@ -15,6 +15,7 @@ from .process_actions import process_action
 from .reply import Reply, MessageType
 from .logging import setupLogging
 from .error import Error
+from . import coordinates
 
 
 class ShopsCog(commands.Cog):
@@ -25,6 +26,11 @@ class ShopsCog(commands.Cog):
     self._config = Config()
     logSettings = self._config.logging
     setupLogging(logSettings['level'],logSettings['output_folder'],logSettings['prefix'],logSettings['max_files'])
+    dynmapSettings = self._config.dynmap
+    coordinates.Dynmap.setServer(dynmapSettings['server'])
+    coordinates.Dynmap.setWorldName(coordinates.World.Overworld, dynmapSettings['overworld'])
+    coordinates.Dynmap.setWorldName(coordinates.World.Nether, dynmapSettings['nether'])
+    coordinates.Dynmap.setWorldName(coordinates.World.End, dynmapSettings['end'])
     self._mgr = ShopManager(sqlitebackend.SqliteBackend(self._config.databaseuri))
     self._lastAction = None
     logging.getLogger(__name__).info(f"Shops Cog started")

@@ -1,9 +1,0 @@
-{
-  "databaseuri" : "/path/to/database"
-  "logging" : {
-    "level": "INFO",
-    "output_folder": "/var/logs",
-    "max_files": 10,
-    "prefix": "shops_"
-  }
-}

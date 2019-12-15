@@ -5,6 +5,33 @@ class World(enum.Enum):
   Nether = 2
   End = 3
 
+def World2Str(world: World) -> str:
+  if world == World.Nether:
+    return "Nether"
+  if world == World.End:
+    return "End"
+  return "Overworld"
+
+class Dynmap:
+  _worlds = {
+    World.Overworld: None,
+    World.Nether: None,
+    World.End: None
+  }
+  _server : None
+  @staticmethod
+  def getWorldName(world: World) -> str:
+    return Dynmap._worlds[world]
+  @staticmethod
+  def setWorldName(world: World, name: str):
+    Dynmap._worlds[world] = name
+  @staticmethod
+  def getServer() -> str:
+    return Dynmap._server
+  @staticmethod
+  def setServer(server: str):
+    Dynmap._server = server
+
 class Coordinates:
   def __init__(self, x: int = None, y: int = None, z: int = None, world: World = World.Overworld):
     super().__init__()
@@ -20,7 +47,13 @@ class Coordinates:
   def getDynmapUrl(self):
     if not self.isValid:
       return None
-    return "http://patreon.docm77.de:8123/?worldname=DocsWorldTour&mapname=flat&zoom=5&x%s&&z=%s" % (self.x, self.z)
+    server = Dynmap.getServer()
+    if not server:
+      return None
+    world = Dynmap.getWorldName(self.world)
+    if not world:
+      return None
+    return f"{server}/?worldname={world}&mapname=flat&zoom=5&x={self.x}&z={self.z}"
 
   def isSame(self, other):
     myself = self.__dict__

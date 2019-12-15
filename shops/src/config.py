@@ -13,7 +13,7 @@ class Config:
     configpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.json")
     print(configpath)
     if not os.path.exists(configpath):
-      raise Exception("No config found. Please rename config.json.example to config.json and adapt it to your needs")
+      raise Exception("No config found. Please rename config.example.json to config.json and adapt it to your needs")
     print(f"Loading config from {configpath}")
     with codecs.open(configpath, "r", "utf-8") as f:
       data = f.read()
@@ -26,4 +26,7 @@ class Config:
   @property
   def logging(self):
     return Config._config['logging']
-      
+
+  @property
+  def dynmap(self):
+    return Config._config['dynmap']
