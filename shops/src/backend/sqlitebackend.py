@@ -65,6 +65,7 @@ class SqliteBackend(BackendInterface):
   def _row2shop(self, row: typing.List) -> Shop:
     owner = row['owner'].split(",") if row['owner'] else []
     shop = Shop(row['name'], owner, [], row['coordinates'], row['post'], row['shop_id'])
+    shop.coords.world = World(row['world'])
     return shop
 
   def _row2item(self, row: typing.List, shop: Shop = None) -> Item:

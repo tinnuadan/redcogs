@@ -3,3 +3,6 @@ class Error(Exception):
 
 class ParsingError(Error):
   pass
+
+class WorldUnkownError(Error):
+  pass

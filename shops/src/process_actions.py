@@ -9,6 +9,7 @@ from .shop import Shop
 from .backend import sqlitebackend
 from .reply import Reply
 from .item import Item
+from . import error
 
 
 def process_action(manager: ShopManager, action: Action, confirmed: bool = False) -> Reply:
@@ -87,10 +88,7 @@ def _do_action_show(mgr, id, verbose):
     items = "No items sold yet"
   res = Reply.CreateEmbed(None, f"{shop.name} (ID {shop.id})" if verbose else f"{shop.name}")
   embed: Embed = res.embed
-  print(embed)
-  print(owner)
   embed.add_field(name="Owner", value=owner, inline=True)
-  print(embed)
   embed.add_field(name="Location", value=str(shop.coords), inline=True)
   embed.add_field(name="World", value=World2Str(shop.coords.world), inline=True)
   embed.add_field(name="Sold Items", value=items, inline=False)
@@ -206,7 +204,11 @@ def _create_shop(payload: typing.Dict):
   coords.x = _get_or_default(payload, 'x', None)
   coords.y = _get_or_default(payload, 'y', None)
   coords.z = _get_or_default(payload, 'z', None)
-  coords.world = World.Overworld
+  worldidx = _get_or_default(payload, 'world', 1)
+  try:
+    coords.world = World(worldidx)
+  except ValueError:
+    raise error.WorldUnkownError(f"Unable to convert {worldidx} to a world. Please use 1 for the overworld, 2 for the nether and 3 for the end.")
 
   res = Shop()
   res.name = _get_or_default(payload, 'name', '')
@@ -232,7 +234,11 @@ def _clone_shop_if_not_set(shop: Shop, payload: typing.Dict):
   coords.x = _get_or_default(payload, 'x', shop.coords.x)
   coords.y = _get_or_default(payload, 'y', shop.coords.y)
   coords.z = _get_or_default(payload, 'z', shop.coords.z)
-  coords.world = _get_or_default(payload, 'world', shop.coords.world)
+  worldidx = _get_or_default(payload, 'world', shop.coords.world.value)
+  try:
+    coords.world = World(worldidx)
+  except ValueError:
+    raise error.WorldUnkownError(f"Unable to convert {worldidx} to a world. Please use 1 for the overworld, 2 for the nether and 3 for the end.")
 
   res = Shop()
   res.name = _get_or_default(payload, 'name', shop.name)
