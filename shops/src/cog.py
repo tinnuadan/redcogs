@@ -13,7 +13,7 @@ from .backend import sqlitebackend
 from .process_message import parse_message
 from .process_actions import process_action
 from .reply import Reply, MessageType
-from .logging import setupLogging
+from .logging import setupLogging, getLogger
 from .error import Error
 from . import coordinates
 
@@ -33,7 +33,7 @@ class ShopsCog(commands.Cog):
     coordinates.Dynmap.setWorldName(coordinates.World.End, dynmapSettings['end'])
     self._mgr = ShopManager(sqlitebackend.SqliteBackend(self._config.databaseuri))
     self._lastAction = None
-    logging.getLogger(__name__).info(f"Shops Cog started")
+    getLogger().info(f"Shops Cog started")
 
   @commands.command()
   async def shop(self, ctx, *, msg):

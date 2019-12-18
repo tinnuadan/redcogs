@@ -1,11 +1,11 @@
 import sqlite3
-import logging
 import typing
 import copy
 from .interface import BackendInterface, SearchKey
 from ..shop import Shop
 from ..item import Item
 from ..coordinates import Coordinates, World
+from ..logging import getLogger
 
 def _dict_factory(cursor: sqlite3.Cursor, row):
   d: typing.Dict = {}
@@ -52,9 +52,8 @@ class SqliteBackend(BackendInterface):
 
   def __init__(self, filename: str = ":memory:"):
     super().__init__()
-    logging.getLogger(__name__).setLevel(logging.INFO)
     if filename == ":memory:":
-      logging.getLogger(__name__).warning("The database is set to be kept in memory")    
+      getLogger().warning("The database is set to be kept in memory")
     self._db: sqlite3.Connection = sqlite3.connect(filename, detect_types=sqlite3.PARSE_DECLTYPES)
     self._db.row_factory = _dict_factory
     self._c: sqlite3.Cursor = self._db.cursor()
@@ -105,7 +104,7 @@ class SqliteBackend(BackendInterface):
       cur.execute("SELECT * FROM `shops` WHERE `name` LIKE :name", {"name": id})
     row = cur.fetchone()
     if not row:
-      logging.getLogger(__name__).error(f"The shop with the id {id} was not found")
+      getLogger().error(f"The shop with the id {id} was not found")
       return None
     shop = self._row2shop(row)
     cur.execute("SELECT * FROM `items` WHERE `shop_id`=:id ORDER BY `name` ASC", {"id": shop.id})
@@ -118,7 +117,7 @@ class SqliteBackend(BackendInterface):
     return shop
     
   def addShop(self, shop: Shop):
-    logging.getLogger(__name__).info(f"Add new shop")
+    getLogger().info(f"Add new shop")
     cur: sqlite3.Cursor = self._c
     owner = ",".join(shop.owner) if shop.owner != None else None
     cur.execute("""INSERT INTO `shops`
@@ -136,15 +135,15 @@ class SqliteBackend(BackendInterface):
 
   def updateShop(self, oldValue: Shop, newValue: Shop):
     if oldValue.id <= 0:
-      logging.getLogger(__name__).error(f"The shop id {oldValue.id} is not valid")
+      getLogger().error(f"The shop id {oldValue.id} is not valid")
       return None
     if self.getShop(oldValue.id) == None:
-      logging.getLogger(__name__).error(f"The shop id {oldValue.id} was not found")
+      getLogger().error(f"The shop id {oldValue.id} was not found")
       return None
     if oldValue.isSame(newValue):
-      logging.getLogger(__name__).info(f"Nothing changed")
+      getLogger().info(f"Nothing changed")
       return oldValue
-    logging.getLogger(__name__).info(f"Updating shop#id{oldValue.id}")
+    getLogger().info(f"Updating shop#id{oldValue.id}")
 
     shop = newValue
     cur: sqlite3.Cursor = self._c
@@ -174,7 +173,7 @@ class SqliteBackend(BackendInterface):
   def removeShop(self, shop) -> bool:
     todelete = self.getShop(shop.id)
     if todelete == None:
-      logging.getLogger(__name__).warning(f"Unable to delete the shop \"{shop.name}\" because it's id wasn't found")
+      getLogger().warning(f"Unable to delete the shop \"{shop.name}\" because it's id wasn't found")
       return False
     
     #remove items:
@@ -189,7 +188,7 @@ class SqliteBackend(BackendInterface):
     cur.execute("SELECT * FROM `items` WHERE `item_id`=:id", {"id": id})
     row = cur.fetchone()
     if not row:
-      logging.getLogger(__name__).error(f"The item with the id {id} was not found")
+      getLogger().error(f"The item with the id {id} was not found")
       return None
     shop = self.getShop(row['shop_id'])
     return shop.getItem(id)
