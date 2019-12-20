@@ -44,7 +44,8 @@ class SqliteBackend(BackendInterface):
 `owner` TEXT,
 `coordinates` `coordinates` TEXT,
 `world` `world` INTEGER,
-`post` TEXT
+`post` TEXT,
+`status` TEXT
 );"""]
   _TBL_ITEMS: str = "items"
   _TBL_SHOPS: str = "shops"
@@ -121,8 +122,8 @@ class SqliteBackend(BackendInterface):
     cur: sqlite3.Cursor = self._c
     owner = ",".join(shop.owner) if shop.owner != None else None
     cur.execute("""INSERT INTO `shops`
-      (`name`,`owner`,`coordinates`,`world`,`post`)
-      VALUES(?,?,?,?,?)""", (shop.name, owner, shop.coords, shop.coords.world, shop.post))
+      (`name`,`owner`,`coordinates`,`world`,`post`,`status`)
+      VALUES(?,?,?,?,?,'active')""", (shop.name, owner, shop.coords, shop.coords.world, shop.post))
     shop.id = cur.lastrowid
 
     items: typing.List = []

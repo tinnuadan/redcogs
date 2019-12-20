@@ -38,11 +38,9 @@ def setupLogging(level, output_folder, prefix, max_files):
 
   formatter = logging.Formatter("%(asctime)s %(levelname)s: %(module)s - %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
 
-  #clear everything  
-  print(logger.handlers)
+  #clear existing handlers
   for handler in logger.handlers:
     logger.removeHandler(handler)
-  print(logger.handlers)
   time.sleep(0.02)
 
   # try to get the log level
@@ -52,10 +50,12 @@ def setupLogging(level, output_folder, prefix, max_files):
   except KeyError:
     pass
 
+  handlers = []
   ch = logging.StreamHandler()
   ch.setLevel(lvl)
   ch.setFormatter(formatter)
-  handlers = [ch]
+  if len(logger.handlers) == 0:
+    handlers.append(ch)
 
   time.sleep(0.02)
 
@@ -66,7 +66,6 @@ def setupLogging(level, output_folder, prefix, max_files):
         os.mkdir(output_folder)
       except FileExistsError:
         pass
-    # logging.getLogger(__name__).info(f"Adding file handler")       
     now = int(time.time())
     fn = f"{output_folder}{sep}{prefix}{now}.log"
     fh = logging.FileHandler(fn)
@@ -75,27 +74,21 @@ def setupLogging(level, output_folder, prefix, max_files):
     handlers.append(fh)
 
   logger.setLevel(lvl)
-  print(handlers)
   for h in handlers:
     logger.addHandler(h)
-  # logging.root.form
-
-  # logging.basicConfig(level=lvl, format=format, handlers=handlers)
-  print(logger.handlers)
 
   if output_folder != None:
     existing_files = glob.glob(f"{output_folder}{sep}{prefix}*.log")
-    if len(existing_files) > max_files+1:
+    if len(existing_files) > max_files:
       existing_files = sorted(existing_files) #ascending -> oldest at front
-      todelete = existing_files[0:max_files]
+      todelete = existing_files[0:len(existing_files)-max_files]
       for file in todelete:
         file = os.path.abspath(file)
         try:
           getLogger().info(f"Removing old log file {file}")    
           os.remove(file)
-        except OSError as error: 
-          print(error) 
-          getLogger().error(f"Unable old log file {file}. Is the file write protected?")    
+        except OSError as error:
+          getLogger().error(f"Unable old log file {file} because of the error: {error}")    
 
     
 

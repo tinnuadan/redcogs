@@ -10,8 +10,8 @@ def test_coordinates():
   for i in list(perm):
     coords = Coordinates(i[0], i[1], i[2])
     gt = ""
-    gt = gt + ("?" if i[0]==None else str(i[0])) + ","
-    gt = gt + ("?" if i[1]==None else str(i[1])) + ","
+    gt = gt + ("?" if i[0]==None else str(i[0])) + ", "
+    gt = gt + ("?" if i[1]==None else str(i[1])) + ", "
     gt = gt + ("?" if i[2]==None else str(i[2]))
     assert gt == str(coords)
   coords = Coordinates(10,11,12, World.Nether)
