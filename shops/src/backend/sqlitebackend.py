@@ -182,8 +182,8 @@ class SqliteBackend(BackendInterface):
     if not row:
       getLogger().error(f"The item with the id {id} was not found")
       return None
-    shop = self.getShop(row['shop_id'])
-    return shop.getItem(id)
+    shop = self.getShop(int(row['shop_id']))
+    return shop.getItem(int(id))
 
   def updateItem(self, currentItem, newItem):
     cur: sqlite3.Cursor = self._c
