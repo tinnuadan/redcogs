@@ -71,7 +71,7 @@ class SqliteBackend(BackendInterface):
   def _row2item(self, row: typing.List, shop: Shop = None) -> Item:
     return Item(row['name'], row['price'], row['item_id'], shop)
 
-  def list(self):
+  def list(self): #don't fetch shops, only id and name
     cur: sqlite3.Cursor = self._c
     cur.execute("SELECT * FROM `shops` ORDER BY `name` ASC")
     shops = {}
@@ -79,17 +79,8 @@ class SqliteBackend(BackendInterface):
       row = cur.fetchone()
       if not row:
         break
-      shop = self._row2shop(row)
-      shops[shop.id] = copy.deepcopy(shop)
-    cur.execute("SELECT * FROM `items` ORDER BY `name` ASC")
-    while True:
-      row = cur.fetchone()
-      if not row:
-        break
-      shop = shops[row['shop_id']]
-      item = self._row2item(row, shop)
-      shop.items.append(copy.deepcopy(item))
-    return shops.values()
+      shops[row['shop_id']] = row['name']
+    return shops
 
 
   def getShop(self, id: typing.Union[int, str]):
@@ -204,38 +195,39 @@ class SqliteBackend(BackendInterface):
     return updated.name == newItem.name and updated.price == newItem.price
   
   def searchShop(self, needle, where) -> typing.List[Shop]:
-    def _append_if_not_exists(list, shop):
-      for s in list:
-        if s.isSame(shop):
+    def _append_if_not_exists(l, id):
+      if id in l:
           return
-      list.append(shop)
+      l.append(id)
+    ids = []
     res = []
     cur: sqlite3.Cursor = self._c
     # search for name
     if where == SearchKey.Name or where == SearchKey.Any:
-      cur.execute("SELECT * FROM `shops` WHERE `name` LIKE ? ORDER BY `name` ASC ", (f"%{needle}%",))
+      cur.execute("SELECT `shop_id` FROM `shops` WHERE `name` LIKE ? ORDER BY `name` ASC ", (f"%{needle}%",))
       while True:
         row = cur.fetchone()
         if not row:
           break
-        _append_if_not_exists(res, self._row2shop(row))
+        _append_if_not_exists(ids, row['shop_id'])
     # search for owner
     if where == SearchKey.Owner or where == SearchKey.Any:
-      cur.execute("SELECT * FROM `shops` ASC WHERE `owner` LIKE ? ORDER BY `name`", (f"%{needle}%",))
+      cur.execute("SELECT `shop_id` FROM `shops` ASC WHERE `owner` LIKE ? ORDER BY `name`", (f"%{needle}%",))
       while True:
         row = cur.fetchone()
         if not row:
           break
-        _append_if_not_exists(res, self._row2shop(row))
+        _append_if_not_exists(ids, row['shop_id'])
     # search for items
     if where == SearchKey.Items or where == SearchKey.Any:
-      cur.execute("SELECT * FROM `items` WHERE `name` LIKE ? ORDER BY `name`", (f"%{needle}%",))
+      cur.execute("SELECT `shop_id` FROM `items` WHERE `name` LIKE ? ORDER BY `name`", (f"%{needle}%",))
       while True:
         row = cur.fetchone()
         if not row:
           break
-        shop = self.getShop(row['shop_id'])
-        _append_if_not_exists(res, shop)
+        _append_if_not_exists(ids, row['shop_id'])
+    for id in ids:
+      res.append(self.getShop(id))
     return res
 
 

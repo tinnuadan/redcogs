@@ -102,8 +102,8 @@ def _do_action_show(mgr, id, verbose):
 def _action_list(mgr, action: Action):
   list = mgr.list()
   msg = []
-  for shop in list:
-     msg.append(f"{shop.id:3}: {shop.name}")
+  for id, name in list.items():
+     msg.append(f"{id:3}: {name}")
   s="\n".join(msg)
   if len(msg) > 0:
     return Reply.CreatePlain(f"```{s}```")#``, f"List of all shops")
