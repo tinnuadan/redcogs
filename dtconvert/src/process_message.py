@@ -42,8 +42,11 @@ class MessageProcessor:
     return result
 
   def _getDateTime(self, msg, usertzid: int):
+    #is maybe the current time requested?
+    if msg == "now":
+      return self._getNow()
     #try for utc first
-    res: datetime.datetime = self._tryUTC(msg)
+    res: convert.ConvertFrom = self._tryUTC(msg)
     if res:
       return res
     #go down the more elaborate route...
@@ -115,9 +118,15 @@ class MessageProcessor:
       result = convert.ConvertFrom(date, time, tz, True)
     return result
 
+  def _getNow(self) -> convert.ConvertFrom:
+    tz = self._getTzInfo("UTC")
+    now = datetime.datetime.now(tz)
+    date = dthandling.DateObj(now.year, now.month, now.day)
+    time = dthandling.TimeObj(now.hour, now.minute, now.second)
+    return convert.ConvertFrom(date, time, tz, True)
 
 
 
-    
+
 
 
