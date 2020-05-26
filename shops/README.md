@@ -34,7 +34,7 @@ You can set the coordinates of the shop with `-x X -y Y -z Z`. Usually you only 
 
 If your shop is not located in the overworld you might want to set it with `-w WORLD` (or `--world WORLD`) where WORLD is 1 for the overworld, 2 for the nether and 3 for the end.
 ### Post
-You can link a discord announcenment post with `-p POST` or `--p POST`
+You can link a discord announcement post with `-p POST` or `--p POST`
 
 ## Search
 Search for a shop with `!shop search [-n NAME] [-o OWNER] [-i ITEM] [-v] [needle]`

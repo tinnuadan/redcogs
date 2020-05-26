@@ -93,7 +93,7 @@ def _do_action_show(mgr, id, verbose):
   embed.add_field(name="World", value=World2Str(shop.coords.world), inline=True)
   embed.add_field(name="Sold Items", value=items, inline=False)
   if shop.post != None:
-    embed.add_field(name="Announcenment Post", value=shop.post, inline=False)
+    embed.add_field(name="Announcement Post", value=shop.post, inline=False)
   if shop.coords.isValid:
     embed.add_field(name="Show on Dynmap", value=shop.coords.getDynmapUrl(), inline=False)
   return res

@@ -87,7 +87,7 @@ def parse_message(msg):
   parser_add.add_argument('-y', default=None, type=int, help='y-coordinate of the location of the shop')
   parser_add.add_argument('-z', default=None, type=int, help='z-coordinate of the location of the shop')
   parser_add.add_argument('-w', '--world', default=None, type=int, help='world (1: overworld, 2: nether, 3: end)')
-  parser_add.add_argument('-p', '--post', default=None, type=str, help='A link to the announcent post')
+  parser_add.add_argument('-p', '--post', default=None, type=str, help='A link to the announcement post')
 
   parser_find = subparsers.add_parser("search", help="Search for shop", formatter_class=CustomHelpFormatter)
   parser_find.add_argument('needle', nargs='?', default=None, type=str, help='Search in all fields for NEEDLE')
@@ -114,7 +114,7 @@ def parse_message(msg):
   parser_edit.add_argument('-y', default=None, type=int, help='y-coordinate of the location of the shop')
   parser_edit.add_argument('-z', default=None, type=int, help='z-coordinate of the location of the shop')
   parser_edit.add_argument('-w', '--world', default=None, type=int, help='world (1: overworld, 2: nether, 3: end)')
-  parser_edit.add_argument('-p', '--post', default=None, type=str, help='A link to the announcent post')
+  parser_edit.add_argument('-p', '--post', default=None, type=str, help='A link to the announcement post')
 
   parser_add_item = subparsers.add_parser("add-item", help="Add an item to a shop.",formatter_class=CustomHelpFormatter)
   parser_add_item.add_argument('shop-id', type=int, help='the id of the shop')
