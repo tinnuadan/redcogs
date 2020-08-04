@@ -20,18 +20,6 @@ class SpamReminderCog(commands.Cog):
     self._config.register_guild(**default_guild)
     self._counters = dict()
     self._config_loaded = False
-
-  async def auto_load_config(self, guild):
-    if self._config_loaded:
-      return    
-    counters = await self._config.guild(guild).counters()
-    for cnt in counters:
-      data = json.loads(cnt)
-      wc = self.get_channel(guild, data['watched_channel'])
-      ac = self.get_channel(guild, data['channel_out'])
-      counter = message_counter.MessageCounter(wc, ac, int(data['msg_threshold']), int(data['timespan']))
-      self._counters[counter.watched_channel.id] = counter
-    self._config_loaded = True
     
 
   @commands.Cog.listener()
@@ -54,12 +42,6 @@ class SpamReminderCog(commands.Cog):
       counter.clear()
       await message.channel.send(repl)
 
-  async def get_message(self, guild, channel_name = None) -> str:
-    msg = await self._config.guild(guild).msg()
-    if channel_name:
-      msg = msg.replace("<alternative>", channel_name)
-    return msg
-
   @commands.group(name="spamreminder", aliases=["sr"])
   @commands.guild_only()
   async def spamreminder(self, ctx: commands.Context) -> None:
@@ -67,24 +49,6 @@ class SpamReminderCog(commands.Cog):
         Monitors channels and friendly reminds people to move the conversation to another channel if there are too many mesages.
     """
     pass
-
-  def get_channel(self, guild, channel_name_id):
-    if str(channel_name_id)[0] == "<":
-      channel_name_id = channel_name_id[2:-1]
-    for channel in guild.text_channels:
-      channel: discord.TextChannel = channel
-      if str(channel.id) == str(channel_name_id):
-        return channel
-    return None
-
-  def get_counter(self, guild, channel):
-    if not isinstance(channel, discord.TextChannel):
-      channel = get_channel(guild, channel)
-    if not channel:
-      return None
-    if channel.id in self._counters:
-      return self._counters[channel.id]
-    return None
 
   @spamreminder.command()
   async def add(self, ctx, watched_channel, alternative_channel, message_threshold, timespan):
@@ -242,6 +206,42 @@ class SpamReminderCog(commands.Cog):
     await self._config.guild(ctx.guild).msg.set(message)
     msg = await self.get_message(ctx.guild)
     await ctx.send(f"Message changed to:\n{msg}")
+
+  async def auto_load_config(self, guild):
+    if self._config_loaded:
+      return    
+    counters = await self._config.guild(guild).counters()
+    for cnt in counters:
+      data = json.loads(cnt)
+      wc = self.get_channel(guild, data['watched_channel'])
+      ac = self.get_channel(guild, data['channel_out'])
+      counter = message_counter.MessageCounter(wc, ac, int(data['msg_threshold']), int(data['timespan']))
+      self._counters[counter.watched_channel.id] = counter
+    self._config_loaded = True
+
+  async def get_message(self, guild, channel_name = None) -> str:
+    msg = await self._config.guild(guild).msg()
+    if channel_name:
+      msg = msg.replace("<alternative>", channel_name)
+    return msg
+
+  def get_channel(self, guild, channel_name_id):
+    if str(channel_name_id)[0] == "<":
+      channel_name_id = channel_name_id[2:-1]
+    for channel in guild.text_channels:
+      channel: discord.TextChannel = channel
+      if str(channel.id) == str(channel_name_id):
+        return channel
+    return None
+
+  def get_counter(self, guild, channel):
+    if not isinstance(channel, discord.TextChannel):
+      channel = get_channel(guild, channel)
+    if not channel:
+      return None
+    if channel.id in self._counters:
+      return self._counters[channel.id]
+    return None
 
 
 
