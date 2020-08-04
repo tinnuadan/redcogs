@@ -38,7 +38,7 @@ class SpamReminderCog(commands.Cog):
     res = counter.new_msg()
     if res == message_counter.MessageCounterResult.OverThreshold:
       co: discord.TextChannel = counter.channel_out
-      repl = f"It seems to be an unsually high activity in this channel. You may consider moving the conversation to #{co.name}"
+      repl = f"It seems to be an unsually high activity in this channel. You may consider moving the conversation to {co.mention}."
       counter.clear()
       await message.channel.send(repl)
 
@@ -64,7 +64,7 @@ class SpamReminderCog(commands.Cog):
       return
 
     try:
-      timespan = int(timespan)
+      timespan = self.convert_timespan(timespan)
     except ValueError:
       await ctx.send(f"Unable to convert \"{timespan}\" to a number")
       return
@@ -81,7 +81,7 @@ class SpamReminderCog(commands.Cog):
       return
 
     if self.get_counter(ctx.guild, wc):
-      await ctx.send(f"Monitor for #{wc.name} already exist.")
+      await ctx.send(f"Monitor for {wc.mention} already exist.")
       return
 
     counters = await self._config.guild(ctx.guild).counters()
@@ -89,7 +89,7 @@ class SpamReminderCog(commands.Cog):
     counters.append( cntr.toJson() )
     self._counters[wc.id] =  cntr
     await self._config.guild(ctx.guild).counters.set(counters)
-    await ctx.send(f"Monitor for #{wc.name} created.")
+    await ctx.send(f"Monitor for {wc.mention} created.")
 
   @spamreminder.command()
   async def list(self, ctx):
@@ -100,7 +100,8 @@ class SpamReminderCog(commands.Cog):
     counters = self._counters
     repl = []
     for _, cntr in counters.items():
-      repl.append(f"#{cntr.watched_channel.name}: Redirect to #{cntr.channel_out.name} if there are more than {cntr.msg_threshold} with in {cntr.timespan}")
+      timespan = self.timespan_to_str(cntr.timespan)
+      repl.append(f"{cntr.watched_channel.mention}: Redirect to {cntr.channel_out.mention} if there are more than {cntr.msg_threshold} messages within {timespan}")
     if len(repl) == 0:
       await ctx.send("No monitors set up")
       return
@@ -127,7 +128,7 @@ class SpamReminderCog(commands.Cog):
 
     cntr = self.get_counter(ctx.guild, wc)
     if not cntr:
-      await ctx.send(f"There is no monitor set for #{wc.name}")
+      await ctx.send(f"There is no monitor set for {wc.mention}")
       return
 
     if to_edit == 'alternative_channel':
@@ -147,7 +148,7 @@ class SpamReminderCog(commands.Cog):
     
     if to_edit == 'timespan':
       try:
-        value = int(value)
+        value = self.convert_timespan(value)
       except ValueError:
         await ctx.send(f"Unable to convert \"{value}\" to a number")
         return
@@ -161,7 +162,7 @@ class SpamReminderCog(commands.Cog):
         break
     self._counters[wc.id] =  cntr
     await self._config.guild(ctx.guild).counters.set(counters)
-    await ctx.send(f"Monitor for #{wc.name} updated.")
+    await ctx.send(f"Monitor for {wc.mention} updated.")
 
 
   @spamreminder.command()
@@ -177,7 +178,7 @@ class SpamReminderCog(commands.Cog):
 
     cntr = self.get_counter(ctx.guild, wc)
     if not cntr:
-      await ctx.send(f"There is no monitor set for #{wc.name}")
+      await ctx.send(f"There is no monitor set for {wc.mention}")
       return
 
     counters = await self._config.guild(ctx.guild).counters()
@@ -188,7 +189,7 @@ class SpamReminderCog(commands.Cog):
         break
     del self._counters[wc.id]
     await self._config.guild(ctx.guild).counters.set(counters)
-    await self.send(f"Monitor for #{wc.name} removed")
+    await self.send(f"Monitor for {wc.mention} removed")
 
   @spamreminder.command()
   async def message(self, ctx):
@@ -242,6 +243,47 @@ class SpamReminderCog(commands.Cog):
     if channel.id in self._counters:
       return self._counters[channel.id]
     return None
+
+  def convert_timespan(self, timespan):
+    try:
+      i = int(timespan)
+      return i
+    except:
+      pass
+    units = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400, 'w': 86400*7}
+    timespan = str(timespan)
+    if len(timespan) == 0:
+      raise ValueError
+    unit = timespan[-1]
+    if unit not in units.keys():
+      raise ValueError
+    factor = units[unit]
+    value = 0
+    value = float(timespan[0:-1])
+    return value*factor
+
+  def timespan_to_str(self, timespan):
+    units = {'sec': 1, 'min': 60, 'hours': 3600, 'days': 86400, 'weeks': 86400*7}
+    unit = None
+    val = 0
+    for i in range(0, len(units)-1):
+      k1 = list(units.keys())[i]
+      k2 = list(units.keys())[i+1]
+      if timespan >= units[k1] and timespan < units[k2]:
+        val = self.round(timespan/units[k1])
+        unit = k1
+        break
+    if unit == None:
+      unit = 'w'
+      val = self.round(timespan/units['w'])
+    return f"{val} {unit}"
+  
+  def round(self,a):
+    return round(10*a)/10
+
+
+
+
 
 
 
