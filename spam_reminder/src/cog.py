@@ -1,4 +1,4 @@
-from redbot.core import Config, commands
+from redbot.core import Config, commands, checks
 import discord
 import typing
 import datetime
@@ -44,6 +44,7 @@ class SpamReminderCog(commands.Cog):
 
   @commands.group(name="spamreminder", aliases=["sr"])
   @commands.guild_only()
+  @checks.mod_or_permissions(manage_messages=True)
   async def spamreminder(self, ctx: commands.Context) -> None:
     """
         Monitors channels and friendly reminds people to move the conversation to another channel if there are too many mesages.
@@ -51,6 +52,7 @@ class SpamReminderCog(commands.Cog):
     pass
 
   @spamreminder.command()
+  @checks.mod_or_permissions(manage_messages=True)
   async def add(self, ctx, watched_channel, alternative_channel, message_threshold, timespan):
     """
         New Monitor for a channel
@@ -92,6 +94,7 @@ class SpamReminderCog(commands.Cog):
     await ctx.send(f"Monitor for {wc.mention} created.")
 
   @spamreminder.command()
+  @checks.mod_or_permissions(manage_messages=True)
   async def list(self, ctx):
     """
         Lists all monitors
@@ -109,6 +112,7 @@ class SpamReminderCog(commands.Cog):
 
 
   @spamreminder.command()
+  @checks.mod_or_permissions(manage_messages=True)
   async def edit(self, ctx, watched_channel, to_edit, value):
     """
         Edit monitor of a channel.
@@ -166,6 +170,7 @@ class SpamReminderCog(commands.Cog):
 
 
   @spamreminder.command()
+  @checks.mod_or_permissions(manage_messages=True)
   async def remove(self, ctx, watched_channel):
     """
         Removes monitoring from a channel
@@ -192,6 +197,7 @@ class SpamReminderCog(commands.Cog):
     await self.send(f"Monitor for {wc.mention} removed")
 
   @spamreminder.command()
+  @checks.mod_or_permissions(manage_messages=True)
   async def message(self, ctx):
     """
         The message which is displayed when there are too many messages. <alternative> will be replaced with the name of the alternative channel.
@@ -200,6 +206,7 @@ class SpamReminderCog(commands.Cog):
     await ctx.send(f"Current message:\n{msg}")
 
   @spamreminder.command()
+  @checks.mod_or_permissions(manage_messages=True)
   async def setmessage(self, ctx, message):
     """
         The message which is displayed when there are too many messages. <alternative> will be replaced with the name of the alternative channel.
