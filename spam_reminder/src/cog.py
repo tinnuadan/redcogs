@@ -14,7 +14,7 @@ class SpamReminderCog(commands.Cog):
     default_user = {"usersr": None}
     self._config.register_user(**default_user)
     default_guild = {
-      "msg": "It seems to be an unsually high activity in this channel. You may consider moving the conversation to <alternative>.",
+      "msg": "There seems to be an unsually high activity in this channel. You may consider moving the conversation to <alternative>.",
       "counters": []
     }
     self._config.register_guild(**default_guild)
@@ -38,7 +38,7 @@ class SpamReminderCog(commands.Cog):
     res = counter.new_msg()
     if res == message_counter.MessageCounterResult.OverThreshold:
       co: discord.TextChannel = counter.channel_out
-      repl = f"It seems to be an unsually high activity in this channel. You may consider moving the conversation to {co.mention}."
+      repl = await self.get_message(message.guild, f"{co.mention}")
       counter.clear()
       await message.channel.send(repl)
 
