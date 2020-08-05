@@ -26,7 +26,7 @@ class SpamReminderCog(commands.Cog):
   async def on_message(self, message: discord.Message):
     if message.author.bot:
       return
-    if message.content[0] == '!':
+    if len(message.content)==0 || message.content[0] == '!':
       return
     await self.count_messages(message)
 
