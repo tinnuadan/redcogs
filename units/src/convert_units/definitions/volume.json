@@ -94,6 +94,7 @@
   , "to_anchor": 0.55411
   }
 , "fl-oz": {
+    "aliases": ["floz"],
     "name": {
       "singular": "Fluid Ounce"
     , "plural": "Fluid Ounces"
@@ -129,7 +130,7 @@
   , "to_anchor": 128
   }
 , "ft3": {
-    "aliases": ["cbft"],
+    "aliases": ["cbft", "cb-ft"],
     "name": {
       "singular": "Cubic foot"
     , "plural": "Cubic feet"
@@ -137,7 +138,7 @@
   , "to_anchor": 957.506
   }
 , "yd3": {
-    "aliases": ["cbyd"],
+    "aliases": ["cbyd", "cb-yd"],
     "name": {
       "singular": "Cubic yard"
     , "plural": "Cubic yards"

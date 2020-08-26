@@ -41,7 +41,7 @@ class ConversionResult:
     self.conv: str = conv
 
 class MessageProcessor:
-  _re: re.Pattern = re.compile(r'(-?[\d,]+\.?\d*)\s?([\w\/\'"]+)')
+  _re: re.Pattern = re.compile(r'(-?[\d,]+\.?\d*)\s?([\w\/\'\-"]+)')
   _reTo: re.Pattern = re.compile(r'to\s([\w\/\'"]+)$')
   _special: Dict = None
 
