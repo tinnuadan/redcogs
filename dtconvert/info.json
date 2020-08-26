@@ -1,0 +1,13 @@
+{
+	"author": [
+		"tinnuadan"
+	],
+	"name": "dtconvert",
+	"disabled": false,
+	"short": "A cog to convert time and date for multiple timezones",
+	"description": "A cog which converts a given time and/or date to different timezones",
+	"tags": [],
+	"hidden": false,
+	"min_bot_version": "3.3.10",
+	"end_user_data_statement": "This cog does not persistently store data or metadata about users."
+}

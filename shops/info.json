@@ -1,0 +1,13 @@
+{
+	"author": [
+		"tinnuadan"
+	],
+	"name": "shops",
+	"disabled": false,
+	"short": "A cog to manage a database of shops for Minecraft",
+	"description": "A cog which manages a database of shops. Main intention is for Minecraft MP Servers. Users can easily search for items and shops.",
+	"tags": [],
+	"hidden": false,
+	"min_bot_version": "3.3.10",
+	"end_user_data_statement": "This cog does not persistently store data or metadata about users."
+}
