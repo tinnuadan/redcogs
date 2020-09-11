@@ -1,6 +1,7 @@
-from redbot.core import commands, VersionInfo, version_info
+from redbot.core import commands, checks, Config, VersionInfo, version_info
 import discord
 import traceback
+from typing import Optional
 from .process_message import MessageProcessor, ConversionResult
 from .convert_units.converter import loadConversionsData
 from .error import Error
@@ -11,8 +12,38 @@ class UnitCog(commands.Cog):
   def __init__(self, bot):
     # load data
     loadConversionsData()
-    self.bot = bot
     _ = MessageProcessor()
+    self.bot = bot
+    self.config = Config.get_conf(self, 0xdd227e37d7df40f780bcb9981ac91e26, force_registration=True)
+    default_guild = { 'emoji' : "⚙️" }
+    self.config.register_guild(**default_guild)
+    self.cache = { 'emoji' : None }
+
+  
+  @commands.group(name="units")
+  @commands.guild_only()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def units(self, ctx: commands.Context) -> None:
+    """
+        Settings for unit conversions
+    """
+    pass
+
+  @units.command()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def emoji(self, ctx, emoji: Optional[str] = None,):
+    """
+        Gets or sets the emoji used for reaction-triggered conversion
+    """
+    if not emoji:
+      val = await self._getConfig(ctx.guild, "emoji")
+      await ctx.send(f"Emoji used for reaction-based conversion: {val}")
+    else:
+      val = str(emoji)
+      await self.config.guild(ctx.guild).emoji(val)
+      self.cache['emoji'] =  val
+      await ctx.send(f"Emoji used for reaction-based conversion set")
+
 
   @commands.command()
   async def convert(self, ctx, *, txt):
@@ -46,7 +77,7 @@ class UnitCog(commands.Cog):
     except (discord.errors.NotFound, discord.Forbidden):
       return
 
-    if str(payload.emoji) != "⚙️":
+    if str(payload.emoji) != await self._getConfig(guild, 'emoji'):
       print(str(payload.emoji))
       return
 
@@ -78,4 +109,11 @@ class UnitCog(commands.Cog):
       print("Exception was thrown while trying to process the message: %s" % e)
       traceback.print_exc()
     return None
+    
+
+  async def _getConfig(self, guild, key: str):
+    if not self.cache[key]:
+      self.cache[key] = await getattr(self.config.guild(guild), key)()    
+    return self.cache[key]
+    
 
