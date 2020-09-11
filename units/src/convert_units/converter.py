@@ -62,7 +62,7 @@ class Conversion:
     return self.conversion.metric if not self.is_base_metric else self.conversion.imperial
   
   def convert(self, value: float):
-    print("Converting %s to %s" % (self.base_measure.unit, self.cto().anchor.measure.unit))
+    #print("Converting %s to %s" % (self.base_measure.unit, self.cto().anchor.measure.unit))
     result: float = 0
 
     result = value * self.base_measure.to_anchor - self.base_measure.anchor_shift
@@ -79,7 +79,7 @@ class Conversion:
     return ConversionResult(result, result_measure)
 
   def convertTo(self, value: float, to: Measure):
-    print("Converting %s to %s" % (self.base_measure.unit, to.unit))
+    #print("Converting %s to %s" % (self.base_measure.unit, to.unit))
     result: float = 0
 
     #parents must be the same
