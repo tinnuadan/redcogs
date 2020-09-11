@@ -153,8 +153,6 @@ class MessageProcessor:
       orig: str = str( converter.ConversionResult(val, toConv.matchToProcess.conversion.base_measure) )
 
       if toConv.override_to_conversion != None:
-        print("forced conversion")
-        
         if toConv.override_to_conversion.base_measure.parent == toConv.matchToProcess.conversion.base_measure.parent:
           # if the parents are the same (i.e. imperial -> imperial or metric -> metric)
           result = toConv.matchToProcess.conversion.convertTo(val, toConv.override_to_conversion.base_measure)
