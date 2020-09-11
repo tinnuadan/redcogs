@@ -5,6 +5,7 @@ from typing import Optional
 from .process_message import MessageProcessor, ConversionResult
 from .convert_units.converter import loadConversionsData
 from .error import Error
+from .reply import Reply
 
 class UnitCog(commands.Cog):
   """Searches for units in a message and tries to convert them from metric to imperial and vice versa"""
@@ -37,12 +38,14 @@ class UnitCog(commands.Cog):
     """
     if not emoji:
       val = await self._getConfig(ctx.guild, "emoji")
-      await ctx.send(f"Emoji used for reaction-based conversion: {val}")
+      repl = Reply.CreateEmbed(f"Emoji used for reaction-triggered conversion: {val}", "Config")
+      await ctx.send(embed = repl.embed)
     else:
       val = str(emoji)
       await self.config.guild(ctx.guild).emoji(val)
       self.cache['emoji'] =  val
-      await ctx.send(f"Emoji used for reaction-based conversion set")
+      repl = Reply.CreateEmbed(f"Emoji used for reaction-triggered conversion set", "Config")
+      await ctx.send(embed = repl.embed)
 
 
   @commands.command()
@@ -50,7 +53,7 @@ class UnitCog(commands.Cog):
     """Do the conversion"""
     msg = await self._convert(txt, None)
     if msg:
-      await ctx.send(msg)
+      await ctx.send(embed = msg.embed)
    
 
   @commands.Cog.listener()
@@ -78,33 +81,32 @@ class UnitCog(commands.Cog):
       return
 
     if str(payload.emoji) != await self._getConfig(guild, 'emoji'):
-      print(str(payload.emoji))
       return
 
     msg = await self._convert(message.content, reacted_user)
     if msg:
-      await channel.send(msg)
+      await channel.send(embed = msg.embed)
 
   async def _convert(self, txt: str, user: discord.Member = None):
     mp: MessageProcessor = MessageProcessor()
     try:
       result = mp.processMessage(txt)      
       if isinstance(result, str):
-        return result
+        return Reply.CreateEmbed(result, "Value conversion")
       elif len(result) > 0:
         tmp = []
         for t in result:
           cr: ConversionResult = t
           tmp.append("%s = %s" % (cr.orig, cr.conv))
-        answer = "%s" % ", ".join(tmp)
+        answer = "%s" % "\n".join(tmp)
+        repl = Reply.CreateEmbed(answer, "Value conversion")
         if user:
-          answer = f"{answer}\nRequested by {user.display_name}"
-        return answer
+          repl.embed.set_footer(text = f"Requested by {user.display_name}")
+        return repl
       else:
         print("No convertable units found in %s" % txt)
-    except Error as e:      
-      answer = "Error: %s" % e
-      return answer
+    except Error as e:
+      return Reply.CreateError(e)
     except Exception as e:
       print("Exception was thrown while trying to process the message: %s" % e)
       traceback.print_exc()
