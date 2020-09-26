@@ -18,6 +18,7 @@ class Action:
   def __init__(self, type: ActionType, payload = None):
     self.type = type
     self.payload = payload
+    self.guild_id = 0
 
   @property
   def confirmationNeeded(self) -> bool:

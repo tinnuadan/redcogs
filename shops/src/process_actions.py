@@ -52,7 +52,7 @@ def _action_search(mgr, action: Action):
   elif _get_or_default(pl, 'item') != None:
     needle = pl['item']
     searchKey = SearchKey.Items
-  result = mgr.searchShop(needle, searchKey)
+  result = mgr.searchShop(action.guild_id, needle, searchKey)
   if len(result) > 5:
     return Reply.CreateError("The search returned more than 5 results. Please specify your search.")
   if len(result) == 0:
@@ -100,7 +100,7 @@ def _do_action_show(mgr, id, verbose):
 
 
 def _action_list(mgr, action: Action):
-  list = mgr.list()
+  list = mgr.list(action.guild_id)
   msg = []
   for id, name in list.items():
      msg.append(f"{id:3}: {name}")
@@ -112,7 +112,7 @@ def _action_list(mgr, action: Action):
 
 def _action_add(mgr, action: Action):
   shop = _create_shop(action.payload)
-  shop = mgr.addShop(shop)
+  shop = mgr.addShop(action.guild_id, shop)
   if shop:
     return Reply.CreateSuccess(f"New shop \"{shop.name}\" with id \"{shop.id}\" added.")
   else:
@@ -120,10 +120,10 @@ def _action_add(mgr, action: Action):
 
 def _action_update(mgr, action: Action):
   id = _pop_id(action.payload)
-  shop = mgr.getShop(id)
+  shop = mgr.getShop(action.guild_id, id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
-  shop_updated = mgr.updateShop(shop, _clone_shop_if_not_set(shop, action.payload))
+  shop_updated = mgr.updateShop(action.guild_id, shop, _clone_shop_if_not_set(shop, action.payload))
   if shop_updated:
     return Reply.CreateSuccess(f"The shop \"{shop.name}\" was updated")
   else:
@@ -131,11 +131,11 @@ def _action_update(mgr, action: Action):
   
 def _action_remove(mgr, action: Action, confirm):
   id = action.payload['id']
-  shop = mgr.getShop(id)
+  shop = mgr.getShop(action.guild_id, id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
   if confirm:
-    success = mgr.removeShop(shop)
+    success = mgr.removeShop(action.guild_id, shop)
     if success:
       return Reply.CreateSuccess(f"The shop \"{shop.name}\" was removed")
     else:
@@ -145,13 +145,13 @@ def _action_remove(mgr, action: Action, confirm):
 
 def _action_add_item(mgr, action: Action):
   id = _pop_id(action.payload, 'shop-id')
-  shop: Shop = mgr.getShop(id)
+  shop: Shop = mgr.getShop(action.guild_id, id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
   newvalue = copy.deepcopy(shop)
   itm = _create_item(action.payload)
   newvalue.items.append(itm)
-  updated = mgr.updateShop(shop, newvalue)
+  updated = mgr.updateShop(action.guild_id, shop, newvalue)
   if updated and len(updated.items) == len(shop.items)+1:
     return Reply.CreateSuccess(f"The new item \"{itm.name}\" was added to the shop \"{shop.name}\".")
   else:
@@ -159,11 +159,11 @@ def _action_add_item(mgr, action: Action):
 
 def _action_update_item(mgr, action: Action):
   id = _pop_id(action.payload, 'item-id')
-  item_orig = mgr.getItem(id)
+  item_orig = mgr.getItem(action.guild_id, id)
   if item_orig == None:
     return Reply.CreateError(f"Item with the id {id} not found")
   item_new = _clone_item_if_not_set(item_orig, action.payload)
-  updated = mgr.updateItem(item_orig, item_new)
+  updated = mgr.updateItem(action.guild_id, item_orig, item_new)
   if updated:
     return Reply.CreateSuccess(f"The item \"{item_orig.name}\" (belonging to \"{item_orig.shop.name}\") was updated")
   else:
@@ -171,14 +171,14 @@ def _action_update_item(mgr, action: Action):
 
 def _action_remove_item(mgr, action: Action, confirm):
   id = action.payload['item-id']
-  item = mgr.getItem(id)
+  item = mgr.getItem(action.guild_id, id)
   if item == None:
     return Reply.CreateError(f"Item with the id {id} not found")
   if confirm:
     shop_new = item.shop
     shop_orig = copy.deepcopy(shop_new)
     shop_new.items.remove(item)
-    shop_updated = mgr.updateShop(shop_orig, shop_new)
+    shop_updated = mgr.updateShop(action.guild_id, shop_orig, shop_new)
     if len(shop_updated.items) == len(shop_orig.items) - 1:
       return Reply.CreateSuccess(f"The item \"{item.name}\" (belonging to \"{shop_orig.name}\") was removed")
     else:
