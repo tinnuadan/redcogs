@@ -39,7 +39,7 @@ class ShopsCog(commands.Cog):
   async def shop(self, ctx: commands.Context, *, msg):
     try:
       action = parse_message(msg)
-      action.guild_id = ctx.guild().id
+      action.guild_id = ctx.guild.id
       if action.isError:
         await self._showError(ctx, action)
         return

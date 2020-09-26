@@ -59,16 +59,16 @@ def _action_search(mgr, action: Action):
     return Reply.CreatePlain("Nothing matched your search criteria.")
   res = []
   for r in result:
-    res.append(_do_action_show(mgr, r.id, verbose))
+    res.append(_do_action_show(mgr, action.guild_id, r.id, verbose))
   return res
 
 
 def _action_show(mgr, action: Action):
   id = _pop_id(action.payload)
   verbose = action.payload['verbose']
-  return _do_action_show(mgr, id, verbose)
+  return _do_action_show(mgr, action.guild_id, id, verbose)
 
-def _do_action_show(mgr, id, verbose):
+def _do_action_show(mgr, guild_id, id, verbose):
   def item_to_str(item, verbose):
     res = f"\u2022 {item.name}"
     if verbose:
@@ -77,7 +77,7 @@ def _do_action_show(mgr, id, verbose):
       res += f" sold for {item.price}"
     return res
 
-  shop = mgr.getShop(id)
+  shop = mgr.getShop(guild_id, id)
   if shop == None:
     return Reply.CreateError(f"Shop with the id {id} not found")
   owner = "N.N."

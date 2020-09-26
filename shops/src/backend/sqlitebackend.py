@@ -125,13 +125,13 @@ class SqliteBackend(BackendInterface):
     if len(items) > 0:
       cur.executemany("""INSERT INTO `items` (`guild_id`,`shop_id`,`name`,`price`) VALUES(?,?,?,?)""", items)
     self._db.commit()
-    return self.getShop(shop.id)
+    return self.getShop(guild_id, shop.id)
 
   def updateShop(self, guild_id: int, oldValue: Shop, newValue: Shop):
     if oldValue.id <= 0:
       getLogger().error(f"The shop id {oldValue.id} is not valid")
       return None
-    if self.getShop(oldValue.id) == None:
+    if self.getShop(guild_id, oldValue.id) == None:
       getLogger().error(f"The shop id {oldValue.id} was not found")
       return None
     if oldValue.isSame(newValue):
@@ -162,10 +162,10 @@ class SqliteBackend(BackendInterface):
     if len(items) > 0:
       cur.executemany("""INSERT INTO `items` (`guild_id`,`shop_id`,`name`,`price`) VALUES(?,?,?,?)""", items)
     self._db.commit()
-    return self.getShop(oldValue.id)
+    return self.getShop(guild_id, oldValue.id)
 
   def removeShop(self, guild_id: int, shop) -> bool:
-    todelete = self.getShop(shop.id)
+    todelete = self.getShop(guild_id, shop.id)
     if todelete == None:
       getLogger().warning(f"Unable to delete the shop \"{shop.name}\" because it's id wasn't found")
       return False
@@ -184,7 +184,7 @@ class SqliteBackend(BackendInterface):
     if not row:
       getLogger().error(f"The item with the id {id} was not found")
       return None
-    shop = self.getShop(int(row['shop_id']))
+    shop = self.getShop(guild_id, int(row['shop_id']))
     return shop.getItem(int(id))
 
   def updateItem(self, guild_id: int, currentItem, newItem):
@@ -193,7 +193,7 @@ class SqliteBackend(BackendInterface):
       return True
     cur.execute("UPDATE `items` SET `name`=:name, `price`=:price WHERE `item_id`=:id", {"id": currentItem.id, 'name': newItem.name, 'price': newItem.price})
     self._db.commit()
-    updated = self.getItem(currentItem.id)
+    updated = self.getItem(guild_id, currentItem.id)
     return updated.name == newItem.name and updated.price == newItem.price
   
   def searchShop(self, guild_id: int, needle, where) -> typing.List[Shop]:
@@ -214,7 +214,7 @@ class SqliteBackend(BackendInterface):
         _append_if_not_exists(ids, row['shop_id'])
     # search for owner
     if where == SearchKey.Owner or where == SearchKey.Any:
-      cur.execute("SELECT `shop_id` FROM `shops` ASC WHERE WHERE `guild_id`=? AND `owner` LIKE ? ORDER BY `name`", (guild_id, f"%{needle}%"))
+      cur.execute("SELECT `shop_id` FROM `shops` ASC WHERE `guild_id`=? AND `owner` LIKE ? ORDER BY `name`", (guild_id, f"%{needle}%"))
       while True:
         row = cur.fetchone()
         if not row:
@@ -222,14 +222,14 @@ class SqliteBackend(BackendInterface):
         _append_if_not_exists(ids, row['shop_id'])
     # search for items
     if where == SearchKey.Items or where == SearchKey.Any:
-      cur.execute("SELECT `shop_id` FROM `items` WHERE WHERE `guild_id`=? AND `name` LIKE ? ORDER BY `name`", (guild_id, f"%{needle}%"))
+      cur.execute("SELECT `shop_id` FROM `items` WHERE `guild_id`=? AND `name` LIKE ? ORDER BY `name`", (guild_id, f"%{needle}%"))
       while True:
         row = cur.fetchone()
         if not row:
           break
         _append_if_not_exists(ids, row['shop_id'])
     for id in ids:
-      res.append(self.getShop(id))
+      res.append(self.getShop(guild_id, id))
     return res
 
 
