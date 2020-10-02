@@ -36,9 +36,10 @@ class ShopsCog(commands.Cog):
     getLogger().info(f"Shops Cog started")
 
   @commands.command()
-  async def shop(self, ctx, *, msg):
+  async def shop(self, ctx: commands.Context, *, msg):
     try:
       action = parse_message(msg)
+      action.guild_id = ctx.guild.id
       if action.isError:
         await self._showError(ctx, action)
         return

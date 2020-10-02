@@ -10,26 +10,26 @@ class ShopManager(BackendInterface):
     super().__init__()
     self._backend = backend
 
-  def getShop(self, id: typing.Union[int, str]):
-    return self._backend.getShop(id)
+  def getShop(self, guild_id: int, id: typing.Union[int, str]):
+    return self._backend.getShop(guild_id, id)
 
-  def addShop(self, shop: Shop) -> typing.Union[None, Shop]:
-    return self._backend.addShop(shop)
+  def addShop(self, guild_id: int, shop: Shop) -> typing.Union[None, Shop]:
+    return self._backend.addShop(guild_id, shop)
 
-  def removeShop(self, shop: Shop) -> bool:
-    return self._backend.removeShop(shop)
+  def removeShop(self, guild_id: int, shop: Shop) -> bool:
+    return self._backend.removeShop(guild_id, shop)
 
-  def updateShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
-    return self._backend.updateShop(currentShop, newShop)
+  def updateShop(self, guild_id: int, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
+    return self._backend.updateShop(guild_id, currentShop, newShop)
 
-  def searchShop(self, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
-    return self._backend.searchShop(needle, where)
+  def searchShop(self, guild_id: int, needle: str, where: SearchKey) -> typing.Union[None, Shop]:
+    return self._backend.searchShop(guild_id, needle, where)
 
-  def getItem(self, id):
-    return self._backend.getItem(id)
+  def getItem(self, guild_id: int, id):
+    return self._backend.getItem(guild_id, id)
 
-  def updateItem(self, currentItem, newItem):
-    return self._backend.updateItem(currentItem, newItem)
+  def updateItem(self, guild_id: int, currentItem, newItem):
+    return self._backend.updateItem(guild_id, currentItem, newItem)
 
-  def list(self) -> typing.List:
-    return self._backend.list()
+  def list(self, guild_id: int) -> typing.List:
+    return self._backend.list(guild_id)

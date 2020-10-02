@@ -13,26 +13,26 @@ class BackendInterface:
   def __init__(self):
     super().__init__()
 
-  def getShop(self, id: typing.Union[int, str]) -> typing.Union[None, Shop]:
+  def getShop(self, guild_id: int, id: typing.Union[int, str]) -> typing.Union[None, Shop]:
     return None
 
-  def addShop(self, shop: Shop) -> typing.Union[None, Shop]:
+  def addShop(self, guild_id: int, shop: Shop) -> typing.Union[None, Shop]:
     return None
 
-  def removeShop(self, shop: Shop) -> bool:
+  def removeShop(self, guild_id: int, shop: Shop) -> bool:
     return False
 
-  def updateShop(self, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
+  def updateShop(self, guild_id: int, currentShop: Shop, newShop: Shop) -> typing.Union[None, Shop]:
     return None
 
-  def searchShop(self, needle: str, where: SearchKey) -> typing.List[Shop]:
+  def searchShop(self, guild_id: int, needle: str, where: SearchKey) -> typing.List[Shop]:
     return None
 
-  def getItem(self, id: int) -> typing.Union[None, Item]:
+  def getItem(self, guild_id: int, id: int) -> typing.Union[None, Item]:
     return None
 
-  def updateItem(self, currentItem: Item, newItem: Item) -> bool:
+  def updateItem(self, guild_id: int, currentItem: Item, newItem: Item) -> bool:
     return False
 
-  def list(self) -> typing.List:
+  def list(self, guild_id: int) -> typing.List:
     return []
