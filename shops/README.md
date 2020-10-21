@@ -28,7 +28,7 @@ The only required argument is the name. If it contains a space encase it in doub
 ### Owner
 You can set an owner with `-o OWNER` or `--owner OWNER`. You can also specify multiple owners by `-o OWNER1 -o OWNER2`. Use double quotes if the name contains a space.
 ### Items
-You can set the sold items with `-o ITEM:PRICE` or `--item ITEM:PRICE`. You can also specify multiple sold items by `-i ITEM1:PRICE1 -o ITEM1:PRICE1`. Use double quotes if the the whole string contains a space. You can also add items later.
+You can set the sold items with `-i ITEM:PRICE` or `--item ITEM:PRICE`. You can also specify multiple sold items by `-i ITEM1:PRICE1 -i ITEM1:PRICE1`. Use double quotes if the the whole string contains a space. You can also add items later.
 ### Coordinates
 You can set the coordinates of the shop with `-x X -y Y -z Z`. Usually you only have to specify y if it's not on the surface.
 
@@ -39,7 +39,7 @@ You can link a discord announcement post with `-p POST` or `--p POST`
 ## Search
 Search for a shop with `!shop search [-n NAME] [-o OWNER] [-i ITEM] [-v] [needle]`
 
-You can use `!shop search <needle>` to search for `needle` ina ll fields (i.e. name of the shop, owners and sold items) or  search specificily for any of those fields. For example you can search for a specific sold item with `!shop search -i ITEM` (or `!shop search --item ITEM`).
+You can use `!shop search <needle>` to search for `needle` in all fields (i.e. name of the shop, owners and sold items) or  search specificily for any of those fields. For example you can search for a specific sold item with `!shop search -i ITEM` (or `!shop search --item ITEM`).
 
 All search commands implcitly use wildcards and are case insensitive, so `!shop search axe` would also find "pickaxe".
 
