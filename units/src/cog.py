@@ -42,8 +42,8 @@ class UnitCog(commands.Cog):
       await ctx.send(embed = repl.embed)
     else:
       val = str(emoji)
-      await self.config.guild(ctx.guild).emoji(val)
-      self.cache['emoji'] =  val
+      await self.config.guild(ctx.guild).emoji.set(val)
+      self.cache['emoji'] = None
       repl = Reply.CreateEmbed(f"Emoji used for reaction-triggered conversion set", "Config")
       await ctx.send(embed = repl.embed)
 
