@@ -1,6 +1,6 @@
-from redbot.core import Config, commands
+from redbot.core import Config, commands, checks
 import discord
-import typing
+from typing import Optional
 import datetime
 from .process_message import MessageProcessor
 from .timezones import Timezones
@@ -20,7 +20,9 @@ class DTConvertCog(commands.Cog):
     self._timezoneids = ["UTC","America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"]
     self._config = Config.get_conf(self, 83576746, force_registration=True)
     default_user = {"usertz": None}
+    default_guild = {"timezones": ["UTC","America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"], "usertimezones": False}
     self._config.register_user(**default_user)
+    self._config.register_guild(**default_guild)
 
 
   @commands.command()
@@ -33,15 +35,36 @@ class DTConvertCog(commands.Cog):
     msg = await self._tz(ctx, datetime) 
     await ctx.send(msg)
 
+
+  @commands.group(name="dtconvert")
+  @commands.guild_only()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def dtconvert(self, ctx: commands.Context) -> None:
+    """
+        Settings for dtconvert
+    """
+    pass
+
+  @dtconvert.command()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def list(self, ctx, emoji: Optional[str] = None,):
+    """
+        List timezones to convert to
+    """
+    timezones = await self._config.guild(ctx.guild).timezones()
+    await ctx.send(timezones)
+
+
   async def _tz(self, ctx, datetime):
     """Converts date and time to multiple timezones"""
+    usertimezones = await self._config.guild(ctx.guild).usertimezones()
     txt = datetime.strip()
     msg: str = None
     if txt == "help":
       msg = self._help()
     elif txt == "tz":
       msg = self._avtzs()
-    elif txt[0:2] == "me" and False: # TODO: enable again some time
+    elif txt[0:2] == "me" and usertimezones:
       tmp = txt.split(" ")
       if len(tmp) == 1:
         msg = await usercfg.get_user_tz(ctx, self._config, self._tzs)
