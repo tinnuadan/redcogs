@@ -113,6 +113,7 @@ class Timezones:
       FROM `timezone` tz JOIN `zone` z
       ON tz.zone_id=z.zone_id
       WHERE tz.time_start <= ? AND z.zone_name=?
+      COLLATE NOCASE
       ORDER BY tz.time_start DESC LIMIT 1;""", [unixtime, name])
     row = cur.fetchone()
     if not row:

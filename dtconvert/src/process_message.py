@@ -83,16 +83,22 @@ class MessageProcessor:
     if not time:
       time = dthandling.getMidnight()
 
-    tz = self._getTzInfo(parts[-1].upper())
-    tz_set = tz!=None
+    tz_str = parts[-1]
+    tz = None
+    if "/" in tz_str and len(tz_str) > 6: #len 6: -xx:xx
+      tdate: datetime.date = date if date else dthandling.getToday()
+      tz = self.tzs.getTimezone(tz_str, toUnixTime( datetime.datetime(tdate.year, tdate.month, tdate.day, tzinfo = TzInfo.Construct(0, False))))
+    else:
+      tz = self._getTzInfo(parts[-1].upper())
+
     if tz == None and usertzid != None:
       tdate: datetime.date = date if date else dthandling.getToday()
       tz = self.tzs.getTimezoneByID(usertzid, toUnixTime( datetime.datetime(tdate.year, tdate.month, tdate.day, tzinfo = TzInfo.Construct(0, False))))
     if not tz:
-      print("No timezone for %s found and now timezone was set" % parts[-1].upper())
-      raise TimezoneNotFoundError("No timezone for %s found and now timezone was set" % parts[-1].upper())
+      print("No timezone for %s found" % tz_str)
+      raise TimezoneNotFoundError("No timezone for %s found" % tz_str)
 
-    return convert.ConvertFrom(date, time, tz, tz_set)
+    return convert.ConvertFrom(date, time, tz, tz!=None)
 
 
   def _getTzInfo(self, identifier: str):
