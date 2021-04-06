@@ -17,7 +17,7 @@ class DTConvertCog(commands.Cog):
     self._tzs: Timezones = Timezones()
     self._mp: MessageProcessor = MessageProcessor(self._tzs)
     #todo: load ids from settings
-    self._timezoneids = ["UTC","America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"]
+    self._timezoneids = []
     self._config = Config.get_conf(self, 83576746, force_registration=True)
     default_user = {"usertz": None}
     default_guild = {"timezones": ["UTC","America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"], "usertimezones": False}
@@ -58,6 +58,8 @@ class DTConvertCog(commands.Cog):
   async def _tz(self, ctx, datetime):
     """Converts date and time to multiple timezones"""
     usertimezones = await self._config.guild(ctx.guild).usertimezones()
+    if len(self._timezoneids) == 0:
+      self._timezoneids = await self._config.guild(ctx.guild).timezones()
     txt = datetime.strip()
     msg: str = None
     if txt == "help":
