@@ -23,17 +23,23 @@ async def get_user_tz(ctx: commands.Context, cfg: Config, tzs: Timezones):
 
 async def set_user_tz(ctx: commands.Context, cfg: Config, tzs: Timezones, name: str):
   """ tries to set's the users timezone, sends an error if the identifer is not found """
+  if name.lower() == "help":
+    return _help()
   if name.lower() == "clear":
     await cfg.user(ctx.message.author).usertz.set(None)
     return f"Successfully cleared your timezone."
 
   id = tzs.getTzID(name)
   if not id:
-    return "Unrecognized timezone. Try `tz set Continent/City`: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>"
+    return "Unrecognized timezone. Try `[p]tz me Continent/City`: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>"
   else:
     tz: Timezone = tzs.getTimezoneByID(id, 0)
     await cfg.user(ctx.message.author).usertz.set(id)
     return f"Successfully set your timezone to **{tz.zone_name}**."
 
-
-
+def _help():
+  return """Set a personal timezone with
+`[p]tz me <timezone>`.
+`<timezone>` must be an identifier such as America/New York. See <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for a list.
+To clear your timezone you can run `[p]tz me clear`
+Once you have a timezone set, you can run the `tz` command without specifying one and it will assume your personal timezone."""
