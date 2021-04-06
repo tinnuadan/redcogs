@@ -4,10 +4,10 @@
 	],
 	"name": "dtconvert",
 	"disabled": false,
-	"short": "A cog to convert time and date for multiple timezones",
-	"description": "A cog which converts a given time and/or date to different timezones",
+	"short": "Date and time conversion",
+	"description": "A cog which converts date and time for different timezones",
 	"tags": [],
 	"hidden": false,
 	"min_bot_version": "3.3.10",
-	"end_user_data_statement": "This cog does not persistently store data or metadata about users."
+	"end_user_data_statement": "This cog can be configured in a way that it stores the timezone of user (opt-in). The default state is that this option is disabled."
 }
