@@ -1,9 +1,10 @@
+from time import timezone
 from redbot.core import Config, commands, checks
 import discord
 from typing import Optional
 import datetime
 from .process_message import MessageProcessor
-from .timezones import Timezones
+from .timezones import Timezones, Timezone, TzInfo
 from . import convert
 from . import error
 from . import utils
@@ -16,11 +17,10 @@ class DTConvertCog(commands.Cog):
     # load all the timezones on init
     self._tzs: Timezones = Timezones()
     self._mp: MessageProcessor = MessageProcessor(self._tzs)
-    #todo: load ids from settings
     self._timezoneids = []
     self._config = Config.get_conf(self, 83576746, force_registration=True)
     default_user = {"usertz": None}
-    default_guild = {"timezones": ["UTC","America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"], "usertimezones": False}
+    default_guild = {"timezones": ["America/Los_Angeles", "America/New_York","Europe/London","Europe/Berlin","Australia/Hobart","Pacific/Auckland"], "usertimezones": False, "showutc": True}
     self._config.register_user(**default_user)
     self._config.register_guild(**default_guild)
 
@@ -47,19 +47,59 @@ class DTConvertCog(commands.Cog):
 
   @dtconvert.command()
   @checks.mod_or_permissions(manage_messages=True)
-  async def list(self, ctx, emoji: Optional[str] = None,):
+  async def list(self, ctx):
     """
         List timezones to convert to
     """
     timezones = await self._config.guild(ctx.guild).timezones()
-    await ctx.send(timezones)
+    msg = []
+    for i in range(0, len(timezones)):
+      msg.append(f"{i:2d}: {timezones[i]}")
+    await ctx.send("\n".join(msg))
+
+  @dtconvert.command()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def add(self, ctx, timezone):
+    """
+        Add timezone to list
+    """
+    timezones = await self._config.guild(ctx.guild).timezones()
+    tz: Timezone = self._tzs.getTimezone(timezone.replace(" ","_"), 0)
+    if not tz:
+      await ctx.send(f"{timezone} not found")
+      return
+    if tz.zone_name in timezones:
+      await ctx.send(f"{tz.zone_name} already included")
+      return
+    timezones.append(tz.zone_name)
+    timezones = self._order_timezones(timezones)
+    await self._config.guild(ctx.guild).timezones.set(timezones)
+    self._timezoneids.clear()
+    await ctx.send(f"{tz.zone_name} added")
+
+  def _order_timezones(self, timezones):
+    to_order = dict()
+    result = []
+    for tz_name in timezones:
+      print(tz_name)
+      tz:Timezone = self._tzs.getTimezone(tz_name, 0)
+      to_order[tz.zone_name] = tz.utcoffset(False)
+    #sort by utc offset
+    to_order = sorted(to_order, key=to_order.__getitem__)
+    for tz in to_order:
+      result.append(tz)
+    return result
+
 
 
   async def _tz(self, ctx, datetime):
     """Converts date and time to multiple timezones"""
     usertimezones = await self._config.guild(ctx.guild).usertimezones()
     if len(self._timezoneids) == 0:
+      showutc = await self._config.guild(ctx.guild).showutc()
       self._timezoneids = await self._config.guild(ctx.guild).timezones()
+      if showutc:
+        self._timezoneids.insert(0, "UTC")
     txt = datetime.strip()
     msg: str = None
     if txt == "help":
@@ -97,7 +137,7 @@ class DTConvertCog(commands.Cog):
 `!tz [<date>] <time> <timezone>`.
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
-`<timezone>` should be the abbreviation like "EDT" or "CEST" or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
+`<timezone>` should be the abbreviation like "EDT" or "CEST", an identifier such as America/New York, or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
 You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg
 
