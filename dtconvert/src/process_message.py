@@ -70,20 +70,24 @@ class MessageProcessor:
     time = None
     if match:
       #we have a time
-      data = list(map(lambda x: int(x), match.groups('0')))
+      data = list(map(lambda x: int(x), match.groups(0)))
       ampm: str = None if len(parts) == 1 else parts[1]
       if ampm != None:
         ampm = ampm.lower().replace(".","")
         if ampm not in ["am","pm"]:
           ampm = None
       time = dthandling.getTime(data, ampm)
+      del parts[0]
+      if ampm:
+        del parts[0]
 
     if not time and not date:
       raise ParsingError("Unable to extract date and/or time.")
     if not time:
       time = dthandling.getMidnight()
 
-    tz_str = parts[-1]
+    #tz_str = msg.replace(time_str,"").replace(date_str, "").strip()
+    tz_str = " ".join(parts).strip().replace(" ","_")
     tz = None
     if "/" in tz_str and len(tz_str) > 6: #len 6: -xx:xx
       tdate: datetime.date = date if date else dthandling.getToday()
