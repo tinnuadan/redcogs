@@ -28,11 +28,13 @@ class DTConvertCog(commands.Cog):
   @commands.command()
   async def tz(self, ctx, *, datetime):
     msg = await self._tz(ctx, datetime)
+    msg = msg.replace("[p]", ctx.clean_prefix)
     await ctx.send(msg)
 
   @commands.command()
   async def t(self, ctx, *, datetime):
-    msg = await self._tz(ctx, datetime) 
+    msg = await self._tz(ctx, datetime)
+    msg = msg.replace("[p]", ctx.clean_prefix)
     await ctx.send(msg)
 
 
@@ -44,6 +46,32 @@ class DTConvertCog(commands.Cog):
         Settings for dtconvert
     """
     pass
+
+  @dtconvert.command()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def showutc(self, ctx, enable: Optional[bool] = None):
+    """
+        Show UTC in the results
+    """
+    if enable != None:
+      await self._config.guild(ctx.guild).showutc.set(enable)
+      await ctx.send(f"Show UTC in the results was set to: {enable}")
+    else:
+      enable = await self._config.guild(ctx.guild).showutc()
+      await ctx.send(f"Show UTC in the results is set to: {enable}")
+
+  @dtconvert.command()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def usertimezones(self, ctx, enable: Optional[bool] = None):
+    """
+        Allow users to set their timezone
+    """
+    if enable != None:
+      await self._config.guild(ctx.guild).usertimezones.set(enable)
+      await ctx.send(f"Allow users to set their timezone was set to: {enable}")
+    else:
+      enable = await self._config.guild(ctx.guild).usertimezones()
+      await ctx.send(f"Allow users to set their timezone is set to: {enable}")
 
   @dtconvert.command()
   @checks.mod_or_permissions(manage_messages=True)
@@ -123,22 +151,24 @@ class DTConvertCog(commands.Cog):
       msg = self._help()
     elif txt == "tz":
       msg = self._avtzs()
-    elif txt[0:2] == "me" and usertimezones:
+    elif txt[0:2] == "me":
+      if not usertimezones:
+        return "Personal timezones are not enabled"
       tmp = txt.split(" ")
       if len(tmp) == 1:
         msg = await usercfg.get_user_tz(ctx, self._config, self._tzs)
       elif len(tmp) == 2:
         msg = await usercfg.set_user_tz(ctx, self._config, self._tzs, tmp[1])
       else:
-        msg = "Error in syntax. Try `!tz me <timezone>` to view or set your timezone"
+        msg = "Error in syntax. Try `[p]tz me <timezone>` to view or set your timezone"
     else:
       try:
         tzid = await usercfg.get_user_tzid(ctx, self._config)
         msg = self._doConversion(txt, tzid)
       except error.TimezoneNotFoundError:
-        msg = "The timezone identifier was not found. Please have a look at `!tz tz` for valid identifiers."
+        msg = "The timezone identifier was not found. Please have a look at `[p]tz tz` for valid identifiers."
       except error.ParsingError:
-        msg = "Unable to extract date and/or time. Please have a look at `!tz help` for help on formatting."
+        msg = "Unable to extract date and/or time. Please have a look at `[p]tz help` for help on formatting."
       except error.DateError as e:
         msg = str(e)
       except error.TimeError as e:
@@ -151,17 +181,17 @@ class DTConvertCog(commands.Cog):
 
   def _help(self):
     msg = """Convert a date and time or only a time with:
-`!tz [<date>] <time> <timezone>`.
+`[p]tz [<date>] <time> <timezone>`.
 `<date>` can be either `dd.mm.[yy]yy` or `mm/dd/[yy]yy` or omitted totally.
 `<time>` can be `hh[:mm] [am/pm]`. If am or pm is not specified, the 24h clock will be used.
-`<timezone>` should be the abbreviation like "EDT" or "CEST", an identifier such as America/New York, or an UTC offset like "+1000" / "+10:00". For possible values please use `!tz tz`.
-You can also specifiy everything according to ISO 8601: `!tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
+`<timezone>` should be the abbreviation like "EDT" or "CEST", an identifier such as America/New York, or an UTC offset like "+1000" / "+10:00". For possible values please use `[p]tz tz`.
+You can also specifiy everything according to ISO 8601: `[p]tz yyyy-mm-ddThh:mm:ss+hh:mm`."""
     return msg
 
   def _avtzs(self):
     av = self._tzs.getAvailableAbbreviations()
     av = ", ".join(av)
-    msg = "Available timezone abbreviations:\n`%s`\nSee also <https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations>" % av
+    msg = "Available timezone abbreviations:\n`%s`\nSee also <https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations> and <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>" % av
     return msg
 
   def _doConversion(self, msg, tzid: int):
