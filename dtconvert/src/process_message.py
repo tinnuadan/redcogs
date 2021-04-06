@@ -93,7 +93,7 @@ class MessageProcessor:
       tdate: datetime.date = date if date else dthandling.getToday()
       tz = self.tzs.getTimezone(tz_str, toUnixTime( datetime.datetime(tdate.year, tdate.month, tdate.day, tzinfo = TzInfo.Construct(0, False))))
     else:
-      tz = self._getTzInfo(parts[-1].upper())
+      tz = self._getTzInfo(tz_str)
 
     if tz == None and usertzid != None:
       tdate: datetime.date = date if date else dthandling.getToday()
