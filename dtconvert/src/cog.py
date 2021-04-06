@@ -57,11 +57,28 @@ class DTConvertCog(commands.Cog):
       msg.append(f"{i:2d}: {timezones[i]}")
     await ctx.send("\n".join(msg))
 
+
+  @dtconvert.command()
+  @checks.mod_or_permissions(manage_messages=True)
+  async def remove(self, ctx, id: int):
+    """
+        Removes a timezone from the list
+    """
+    timezones = await self._config.guild(ctx.guild).timezones()
+    if id < 0 or id >= len(timezones):
+      await ctx.send(f"ID {id} out of range")
+      return
+    to_delete = timezones[id]
+    del timezones[id]
+    await self._config.guild(ctx.guild).timezones.set(timezones)
+    self._timezoneids.clear()
+    await ctx.send(f"Timezone \"{to_delete}\" was removed")
+
   @dtconvert.command()
   @checks.mod_or_permissions(manage_messages=True)
   async def add(self, ctx, timezone):
     """
-        Add timezone to list
+        Add timezone to the list
     """
     timezones = await self._config.guild(ctx.guild).timezones()
     tz: Timezone = self._tzs.getTimezone(timezone.replace(" ","_"), 0)
