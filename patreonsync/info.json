@@ -1,0 +1,13 @@
+{
+	"author": [
+		"tinnuadan"
+	],
+	"name": "PatreonSync",
+	"disabled": false,
+	"short": "Syncing discord to minecraft ids",
+	"description": "Syncing a discord account to a minecraft account",
+	"tags": [],
+	"hidden": false,
+	"min_bot_version": "3.3.10",
+	"end_user_data_statement": "This cog does not persistently store data or metadata about users."
+}
