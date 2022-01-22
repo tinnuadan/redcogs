@@ -26,11 +26,21 @@ class PatreonSyncCog(commands.Cog):
     self.dbsync.server = await self._getConfig(ctx.guild, "server")
     self.dbsync.user = await self._getConfig(ctx.guild, "user")
     self.dbsync.password = await self._getConfig(ctx.guild, "password")
-    msg = await self._link(txt, ctx.author)
+    msg = await self._linkunlink(txt, ctx.author, doLink = True)
     if msg:
       await ctx.send(embed = msg.embed)
 
-  async def _link(self, username, user: discord.User):
+  @commands.command()
+  async def unlink(self, ctx, *, txt):
+    """Link discord to minecraft """
+    self.dbsync.server = await self._getConfig(ctx.guild, "server")
+    self.dbsync.user = await self._getConfig(ctx.guild, "user")
+    self.dbsync.password = await self._getConfig(ctx.guild, "password")
+    msg = await self._linkunlink(txt, ctx.author, doLink = False)
+    if msg:
+      await ctx.send(embed = msg.embed)
+
+  async def _linkunlink(self, username, user: discord.User, doLink):
     mcUser: Dict = self.mcuuid.getUUID(username)
     if mcUser["result"] == UUIDResult.NotValid:
       return Reply.CreateError(f"Minecraft account \"{username}\" not valid.")
@@ -39,7 +49,10 @@ class PatreonSyncCog(commands.Cog):
     if mcUser["result"] == UUIDResult.NetworkError:
       return Reply.CreateError("Unable to query Mojang API servers. Please try again later.")
     
-    linkRes = self.dbsync.link(user.id, mcUser["id"])
+    if doLink:
+      linkRes = self.dbsync.link(user.id, mcUser["id"])
+    else:
+      linkRes = self.dbsync.unlink(user.id, mcUser["id"])
     if linkRes == SyncResult.DBNotSetup:
       return Reply.CreateError("Database connection not setup.")
     if linkRes == SyncResult.NoDBConnection:
@@ -47,7 +60,10 @@ class PatreonSyncCog(commands.Cog):
     if linkRes == SyncResult.DBError:
       return Reply.CreateError("General database error.")
     
-    return Reply.CreateSuccess(f"{mcUser['name']} linked to {user.name}.")   
+    if doLink:
+      return Reply.CreateSuccess(f"IGN {mcUser['name']} linked to discord user {user.name}.")   
+    else:
+      return Reply.CreateSuccess(f"IGN {mcUser['name']} unlinked from discord user {user.name}.")   
   
   @commands.group(name="patreonsync")
   @commands.guild_only()
